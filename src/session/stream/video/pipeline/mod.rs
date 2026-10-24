@@ -765,6 +765,8 @@ impl VideoPipelineInner {
 		// Converter per input format, plus the source import whose view it caches.
 		let mut color_converters: std::collections::HashMap<u32, (ColorConverter, Option<Arc<CachedImport>>)> =
 			std::collections::HashMap::new();
+		// Failed submissions must not return DMA-BUFs while conversion may still be running.
+		let mut deferred_frames: Vec<ferriscope::Frame> = Vec::new();
 
 		// Encoding loop - receives frames from compositor.
 		let frame_interval = std::time::Duration::from_secs_f64(1.0 / ctx.fps as f64);
@@ -1102,8 +1104,8 @@ impl VideoPipelineInner {
 				let conversion = match converter.convert_async(source_image, src_layout, encoder.input_image(), &[]) {
 					Ok(point) => point,
 					Err(e) => {
-					if is_device_lost(&e) {
-						return Err(format!("GPU color conversion failed: {e}"));
+						if is_device_lost(&e) {
+							return Err(format!("GPU color conversion failed: {e}"));
 					}
 						tracing::warn!("GPU color conversion failed: {e}");
 						continue;
@@ -1169,10 +1171,12 @@ impl VideoPipelineInner {
 						// Count this frame in flight; the consumer decrements when done.
 						in_flight.fetch_add(1, Ordering::Relaxed);
 						submitted_count += 1;
-						if frame_ctx_tx
+						if let Err(err) = frame_ctx_tx
 							.blocking_send(ConsumerMessage::Frame(frame_context, future, Some(frame)))
-							.is_err()
 						{
+							if let ConsumerMessage::Frame(_, _, Some(frame)) = err.0 {
+								deferred_frames.push(frame);
+							}
 							tracing::debug!("Packet consumer gone; stopping encoding loop.");
 							break;
 						}
@@ -1182,6 +1186,7 @@ impl VideoPipelineInner {
 							return Err(format!("Failed to encode frame: {e}"));
 						}
 						tracing::warn!("Failed to encode frame: {e}");
+						deferred_frames.push(frame);
 					},
 				}
 
@@ -1198,6 +1203,10 @@ impl VideoPipelineInner {
 		if let Err(e) = encoder.flush() {
 			tracing::warn!("Failed to flush encoder: {e}");
 		}
+		// Dropping converters waits for any outstanding conversion commands.
+		// Only then may failed-submission frames be returned to the compositor.
+		drop(color_converters);
+		drop(deferred_frames);
 		drop(frame_ctx_tx);
 		// Wait for the consumer task to drain and send the remaining packets. This
 		// runs on a plain OS thread outside the runtime, so block on the task handle.
