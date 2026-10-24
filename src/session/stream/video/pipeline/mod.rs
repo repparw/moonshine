@@ -259,7 +259,7 @@ enum ConsumerMessage {
 	/// A submitted frame's context together with the [`EncodeFuture`] that
 	/// resolves with its encoded packet. Awaiting the future yields the packet
 	/// for exactly this frame, so context and packet are paired by construction.
-	Frame(FrameContext, EncodeFuture),
+	Frame(FrameContext, EncodeFuture, Option<ferriscope::Frame>),
 	/// Reset the RTP/frame counters (client reconnect/resume), so subsequent
 	/// packets restart from frame 1. Ordered with `Frame` messages so it takes
 	/// effect before any frame submitted after the reset. Carries the reset's
@@ -314,14 +314,14 @@ async fn run_packet_consumer(
 	// Driven by the message channel: one `Frame` per submitted frame. When the
 	// encoding thread drops its sender, this loop ends after the last frame.
 	while let Some(msg) = ctx_rx.recv().await {
-		let (frame_context, future) = match msg {
+		let (frame_context, future, source_frame) = match msg {
 			ConsumerMessage::ResetCounters(epoch) => {
 				frame_number = 0;
 				sequence_number = 0;
 				reset_epoch = epoch;
 				continue;
 			},
-			ConsumerMessage::Frame(frame_context, future) => (frame_context, future),
+			ConsumerMessage::Frame(frame_context, future, source_frame) => (frame_context, future, source_frame),
 		};
 
 		// This frame is in flight until the iteration ends; release its slot on
@@ -349,6 +349,8 @@ async fn run_packet_consumer(
 				continue;
 			},
 		};
+		// Encode completion orders the conversion; only now may the compositor reuse the DMA-BUF.
+		drop(source_frame);
 		let t_packet_ready = std::time::Instant::now();
 		let encode_wait_dur = t_packet_ready.saturating_duration_since(frame_context.submitted_at);
 
@@ -906,7 +908,7 @@ impl VideoPipelineInner {
 								// Count this frame in flight; the consumer decrements when done.
 								in_flight.fetch_add(1, Ordering::Relaxed);
 								submitted_count += 1;
-								let _ = frame_ctx_tx.blocking_send(ConsumerMessage::Frame(frame_context, future));
+								let _ = frame_ctx_tx.blocking_send(ConsumerMessage::Frame(frame_context, future, None));
 							},
 							Err(e) => tracing::warn!("Failed to re-encode frame for IDR request: {e}"),
 						}
@@ -1097,18 +1099,19 @@ impl VideoPipelineInner {
 				*cached_source = Some(Arc::clone(&source_import));
 
 				// Convert to YUV.
-				if let Err(e) = converter.convert(source_image, src_layout, encoder.input_image()) {
+				let conversion = match converter.convert_async(source_image, src_layout, encoder.input_image(), &[]) {
+					Ok(point) => point,
+					Err(e) => {
 					if is_device_lost(&e) {
 						return Err(format!("GPU color conversion failed: {e}"));
 					}
-					tracing::warn!("GPU color conversion failed: {e}");
-					continue;
-				}
+						tracing::warn!("GPU color conversion failed: {e}");
+						continue;
+					},
+				};
 
-				// The DMA-BUF content has been read into the encoder's input
-				// image: dropping the frame returns its buffer to the compositor.
+				// Keep the source borrowed until the GPU has completed conversion.
 				let frame_hdr_metadata = hdr_metadata(&frame.info.colour);
-				drop(frame);
 
 				// Forward HDR mode state changes to the control stream.
 				// In HDR sessions, `enabled` reflects whether the current
@@ -1142,7 +1145,7 @@ impl VideoPipelineInner {
 				// Encode the converted image. This is asynchronous: it submits the
 				// frame without blocking; the encoded packet is produced by the
 				// readback thread and handled by the consumer thread.
-				let encode_result = encoder.encode(encoder.input_image());
+				let encode_result = encoder.encode_after(encoder.input_image(), &[conversion]);
 
 				let t4_encoded = std::time::Instant::now();
 
@@ -1167,7 +1170,7 @@ impl VideoPipelineInner {
 						in_flight.fetch_add(1, Ordering::Relaxed);
 						submitted_count += 1;
 						if frame_ctx_tx
-							.blocking_send(ConsumerMessage::Frame(frame_context, future))
+							.blocking_send(ConsumerMessage::Frame(frame_context, future, Some(frame)))
 							.is_err()
 						{
 							tracing::debug!("Packet consumer gone; stopping encoding loop.");
