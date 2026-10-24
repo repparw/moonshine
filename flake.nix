@@ -44,7 +44,15 @@
 
       devShells = forAllSystems (pkgs: {
         default = pkgs.mkShell {
-          inputsFrom = [ self.packages.${pkgs.stdenv.hostPlatform.system}.moonshine ];
+          # Cargo fetches its own sources in the shell. Do not evaluate the
+          # package's vendor tree or WSI installation just to enter it.
+          inputsFrom = [
+            (self.packages.${pkgs.stdenv.hostPlatform.system}.moonshine.overrideAttrs {
+              cargoDeps = null;
+              postPatch = "";
+              postInstall = "";
+            })
+          ];
           # inputtino-sys's build.rs unconditionally links libc++. The package
           # build strips that from the vendored crate (see nix/package.nix),
           # but plain cargo in this shell builds the real inputtino checkout,

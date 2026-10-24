@@ -60,10 +60,9 @@ let
   # the ferriscope crate is a dependency, so the vendored sources above do not
   # contain it. Build it from the same ferriscope revision Cargo.lock pins, so
   # the layer always matches the compositor linked into moonshine.
-  ferriscopeLockEntry =
-    lib.findFirst (p: p.name == "ferriscope")
-      (throw "ferriscope not found in Cargo.lock")
-      (lib.importTOML ../Cargo.lock).package;
+  ferriscopeLockEntry = lib.findFirst (
+    p: p.name == "ferriscope"
+  ) (throw "ferriscope not found in Cargo.lock") (lib.importTOML ../Cargo.lock).package;
   # e.g. "git+https://github.com/hgaiser/ferriscope?rev=<rev>#<rev>"
   ferriscopeMatch = builtins.match "git\\+([^?#]+)(\\?[^#]*)?#(.+)" ferriscopeLockEntry.source;
   ferriscopeRepo = builtins.fetchGit {
@@ -133,7 +132,7 @@ rustPlatform.buildRustPackage {
       # this fails loudly: a rev bump prints the correct new hash in the
       # mismatch error, and once the pin moves to a rev on a normal branch or
       # tag this entry can simply be deleted.
-      "ash-0.38.0+1.4.329" = "sha256-apzc//AZqS3F4e4Epm3Dl20ZkkMKUvLjyxv7ZwJh1Jw=";
+      "ash-0.38.0+1.4.352" = "sha256-apzc//AZqS3F4e4Epm3Dl20ZkkMKUvLjyxv7ZwJh1Jw=";
     };
   };
 
