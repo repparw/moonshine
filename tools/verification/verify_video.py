@@ -68,6 +68,7 @@ def run_benchmark(command, timeout_seconds):
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
+        errors="replace",
         start_new_session=True,
         env={**os.environ, "NO_COLOR": "1", "RUST_BACKTRACE": "1"},
     )
@@ -124,9 +125,12 @@ def main(argv=None):
         print(json.dumps(checks, indent=2), file=sys.stderr)
         return 2
 
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     out = args.output or Path("target/verification") / f"smoke-{timestamp}"
     out.mkdir(parents=True, exist_ok=True)
+    if (out / "report.json").exists() or (out / "moonshine-bench.log").exists():
+        print(f"Refusing to overwrite existing verification evidence in {out}", file=sys.stderr)
+        return 2
     command = [
         checks["bench"], "--duration", str(args.duration), "--warmup", str(args.warmup),
         "--resolution", args.resolution, "--fps", str(args.fps), "--bitrate", str(args.bitrate),
