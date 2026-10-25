@@ -1242,6 +1242,23 @@ mod tests {
 	}
 
 	#[test]
+	fn failed_blocking_delivery_returns_in_flight_slot() {
+		let count = Arc::new(AtomicUsize::new(0));
+		let (tx, rx) = tokio::sync::mpsc::channel(1);
+		drop(rx);
+		let runtime = tokio::runtime::Builder::new_current_thread()
+			.enable_all()
+			.build()
+			.expect("runtime");
+		let rejected = runtime
+			.block_on(tx.send(InFlightGuard::new(&count)))
+			.expect_err("receiver is closed");
+		assert_eq!(count.load(Ordering::Relaxed), 1);
+		drop(rejected);
+		assert_eq!(count.load(Ordering::Relaxed), 0);
+	}
+
+	#[test]
 	fn dropping_consumer_queue_returns_all_in_flight_slots() {
 		let count = Arc::new(AtomicUsize::new(0));
 		let (tx, rx) = tokio::sync::mpsc::channel(3);
