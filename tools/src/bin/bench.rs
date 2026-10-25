@@ -158,6 +158,9 @@ struct StatsSummary {
 	total: LatencyDistribution,
 	submit: LatencyDistribution,
 	encode_wait: LatencyDistribution,
+	gpu_encode: Option<LatencyDistribution>,
+	bitstream_ready: Option<LatencyDistribution>,
+	gpu_timing_samples: usize,
 	avg_channel_wait_us: f64,
 	avg_import_us: f64,
 	avg_convert_us: f64,
@@ -220,6 +223,8 @@ struct StatsAccumulator {
 	total_samples_us: Vec<u64>,
 	submit_samples_us: Vec<u64>,
 	encode_wait_samples_us: Vec<u64>,
+	gpu_encode_samples_us: Vec<u64>,
+	bitstream_ready_samples_us: Vec<u64>,
 	key_frames: u64,
 	encoded_bytes: u64,
 	start: Instant,
@@ -243,6 +248,8 @@ impl StatsAccumulator {
 			total_samples_us: Vec::new(),
 			submit_samples_us: Vec::new(),
 			encode_wait_samples_us: Vec::new(),
+			gpu_encode_samples_us: Vec::new(),
+			bitstream_ready_samples_us: Vec::new(),
 			key_frames: 0,
 			encoded_bytes: 0,
 			start: now,
@@ -272,6 +279,12 @@ impl StatsAccumulator {
 		self.total_samples_us.push(total);
 		self.submit_samples_us.push(submit);
 		self.encode_wait_samples_us.push(encode_wait);
+		if let Some(gpu_encode) = stats.gpu_encode {
+			self.gpu_encode_samples_us.push(gpu_encode.as_micros() as u64);
+		}
+		if let Some(bitstream_ready) = stats.bitstream_ready {
+			self.bitstream_ready_samples_us.push(bitstream_ready.as_micros() as u64);
+		}
 		if stats.is_key_frame {
 			self.key_frames += 1;
 		}
@@ -301,6 +314,19 @@ impl StatsAccumulator {
 			total: LatencyDistribution::new(self.total_us, &self.total_samples_us),
 			submit: LatencyDistribution::new(self.submit_us, &self.submit_samples_us),
 			encode_wait: LatencyDistribution::new(self.encode_wait_us, &self.encode_wait_samples_us),
+			gpu_encode: (!self.gpu_encode_samples_us.is_empty()).then(|| {
+				LatencyDistribution::new(
+					self.gpu_encode_samples_us.iter().map(|&v| v as u128).sum(),
+					&self.gpu_encode_samples_us,
+				)
+			}),
+			bitstream_ready: (!self.bitstream_ready_samples_us.is_empty()).then(|| {
+				LatencyDistribution::new(
+					self.bitstream_ready_samples_us.iter().map(|&v| v as u128).sum(),
+					&self.bitstream_ready_samples_us,
+				)
+			}),
+			gpu_timing_samples: self.gpu_encode_samples_us.len(),
 			avg_channel_wait_us: self.channel_wait_us as f64 / self.count as f64,
 			avg_import_us: self.import_us as f64 / self.count as f64,
 			avg_convert_us: self.convert_us as f64 / self.count as f64,
@@ -357,6 +383,20 @@ impl StatsAccumulator {
 			summary.encode_wait.p95_us,
 			summary.encode_wait.p99_us
 		);
+		if let (Some(gpu), Some(ready)) = (&summary.gpu_encode, &summary.bitstream_ready) {
+			tracing::info!(
+				"  gpu_encode: samples={} avg={:.0}us p50={}us p95={}us; bitstream_ready: avg={:.0}us p50={}us p95={}us",
+				summary.gpu_timing_samples,
+				gpu.avg_us,
+				gpu.p50_us,
+				gpu.p95_us,
+				ready.avg_us,
+				ready.p50_us,
+				ready.p95_us
+			);
+		} else {
+			tracing::info!("  gpu_encode/bitstream_ready: unavailable (0 GPU timestamp samples)");
+		}
 		tracing::info!(
 			"  avg breakdown: ch_wait={avg_channel_wait:.0}us  import={avg_import:.0}us  convert={avg_convert:.0}us  submit={avg_submit:.0}us  enc_wait={avg_encode_wait:.0}us  pkt={avg_packetize:.0}us  send={avg_send:.0}us",
 			avg_channel_wait = summary.avg_channel_wait_us,
