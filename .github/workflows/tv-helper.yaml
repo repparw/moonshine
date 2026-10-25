@@ -1,0 +1,22 @@
+name: Fork TV verification helper tests
+
+on:
+  pull_request:
+    paths:
+      - "tools/tv/**"
+      - ".agents/skills/verify-moonshine-tv/**"
+      - ".github/workflows/tv-helper.yaml"
+  push:
+    branches: ["main"]
+    paths:
+      - "tools/tv/**"
+      - ".agents/skills/verify-moonshine-tv/**"
+      - ".github/workflows/tv-helper.yaml"
+
+jobs:
+  offline-safety-tests:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check TV launcher without touching a TV
+        run: python3 -m unittest discover -s tools/tv -p 'test_*.py'
