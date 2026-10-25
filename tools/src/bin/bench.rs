@@ -953,6 +953,28 @@ mod timing_tests {
 	}
 
 	#[test]
+	fn gpu_timing_distributions_do_not_count_unavailable_frames() {
+		let mut accumulator = StatsAccumulator::new();
+		for n in [100, 200, 300, 400] {
+			accumulator.add(&frame(
+				Some(Duration::from_micros(n)),
+				Some(Duration::from_micros(n + 700)),
+			));
+		}
+		accumulator.add(&frame(None, None));
+		let summary = accumulator.summary().expect("five frames were recorded");
+		assert_eq!(summary.count, 5);
+		assert_eq!(summary.gpu_timing_samples, 4);
+		let gpu = summary.gpu_encode.expect("GPU timestamps should be available");
+		assert_eq!(gpu.avg_us, 250.0);
+		assert_eq!(gpu.p50_us, 200);
+		assert_eq!(gpu.p95_us, 400);
+		let ready = summary.bitstream_ready.expect("Readback timing should be available");
+		assert_eq!(ready.avg_us, 950.0);
+		assert_eq!(ready.p95_us, 1100);
+	}
+
+	#[test]
 	fn gpu_timing_percentiles_use_only_available_samples() {
 		let mut accumulator = StatsAccumulator::new();
 		accumulator.add(&frame(None, None));
