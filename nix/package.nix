@@ -133,7 +133,7 @@ rustPlatform.buildRustPackage {
       # this fails loudly: a rev bump prints the correct new hash in the
       # mismatch error, and once the pin moves to a rev on a normal branch or
       # tag this entry can simply be deleted.
-      "ash-0.38.0+1.4.329" = "sha256-apzc//AZqS3F4e4Epm3Dl20ZkkMKUvLjyxv7ZwJh1Jw=";
+      "ash-0.38.0+1.4.352" = "sha256-apzc//AZqS3F4e4Epm3Dl20ZkkMKUvLjyxv7ZwJh1Jw=";
     };
   };
 
