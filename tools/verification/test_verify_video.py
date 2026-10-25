@@ -55,5 +55,30 @@ class VerifyVideoTests(unittest.TestCase):
             self.assertEqual(report["results"]["frames"], 60)
 
 
+    def test_existing_evidence_is_not_overwritten(self):
+        with tempfile.TemporaryDirectory() as folder:
+            report_path = Path(folder) / "report.json"
+            report_path.write_text("original proof")
+            checks = {"app": "/bin/true", "bench": "/bin/true", "render_nodes": ["/dev/dri/renderD128"], "problems": []}
+            with patch.object(verify_video, "preflight", return_value=checks), patch.object(
+                verify_video, "run_benchmark"
+            ) as run:
+                result = verify_video.main(["smoke", "--output", folder])
+            self.assertEqual(result, 2)
+            self.assertEqual(report_path.read_text(), "original proof")
+            run.assert_not_called()
+
+    def test_preflight_failure_does_not_start_process(self):
+        with tempfile.TemporaryDirectory() as folder:
+            checks = {"app": None, "bench": "/bin/true", "render_nodes": [], "problems": ["no renderer"]}
+            with patch.object(verify_video, "preflight", return_value=checks), patch.object(
+                verify_video, "run_benchmark"
+            ) as run:
+                result = verify_video.main(["smoke", "--output", folder])
+            self.assertEqual(result, 2)
+            self.assertFalse((Path(folder) / "report.json").exists())
+            run.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()
