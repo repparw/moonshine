@@ -892,3 +892,54 @@ fn print_matrix_summary(reports: &[MatrixReport]) {
 fn boxed_error(message: impl Into<String>) -> Box<dyn std::error::Error> {
 	Box::new(std::io::Error::other(message.into()))
 }
+
+#[cfg(test)]
+mod timing_tests {
+	use super::{FrameStats, StatsAccumulator};
+	use std::time::Duration;
+
+	fn frame(gpu_encode: Option<Duration>, bitstream_ready: Option<Duration>) -> FrameStats {
+		FrameStats {
+			channel_wait: Duration::ZERO,
+			import: Duration::ZERO,
+			convert: Duration::ZERO,
+			submit: Duration::ZERO,
+			consumer_queue: Duration::ZERO,
+			encode_wait: Duration::ZERO,
+			gpu_encode,
+			bitstream_ready,
+			packetize: Duration::ZERO,
+			send: Duration::ZERO,
+			total: Duration::ZERO,
+			encoded_bytes: 0,
+			is_key_frame: false,
+		}
+	}
+
+	#[test]
+	fn unavailable_gpu_timestamps_are_not_reported_as_zero_duration() {
+		let mut accumulator = StatsAccumulator::new();
+		accumulator.add(&frame(None, None));
+		let summary = accumulator.summary().expect("one frame was recorded");
+		assert_eq!(summary.gpu_timing_samples, 0);
+		assert!(summary.gpu_encode.is_none());
+		assert!(summary.bitstream_ready.is_none());
+	}
+
+	#[test]
+	fn gpu_timing_percentiles_use_only_available_samples() {
+		let mut accumulator = StatsAccumulator::new();
+		accumulator.add(&frame(None, None));
+		accumulator.add(&frame(
+			Some(Duration::from_micros(1400)),
+			Some(Duration::from_micros(2700)),
+		));
+		let summary = accumulator.summary().expect("two frames were recorded");
+		assert_eq!(summary.gpu_timing_samples, 1);
+		let gpu = summary.gpu_encode.expect("one GPU timing sample");
+		assert_eq!(gpu.p50_us, 1400);
+		assert_eq!(gpu.avg_us, 1400.0);
+		let ready = summary.bitstream_ready.expect("one bitstream timing sample");
+		assert_eq!(ready.p50_us, 2700);
+	}
+}
