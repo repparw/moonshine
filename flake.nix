@@ -54,6 +54,7 @@
           packages = with pkgs; [
             rustfmt
             clippy
+            python3 # Hardware-independent smoke verifier and CI tests
           ];
         };
       });
