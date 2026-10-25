@@ -1,0 +1,24 @@
+name: In-flight ownership model
+
+on:
+  pull_request:
+    paths:
+      - "tools/verification/inflight_model.py"
+      - "tools/verification/test_inflight_model.py"
+      - ".github/workflows/inflight-model.yaml"
+  push:
+    branches: ["main"]
+    paths:
+      - "tools/verification/inflight_model.py"
+      - "tools/verification/test_inflight_model.py"
+      - ".github/workflows/inflight-model.yaml"
+
+jobs:
+  bounded-model:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Explore all abstract ownership interleavings
+        run: python3 tools/verification/inflight_model.py
+      - name: Prove broken rejected-send mutation is detected
+        run: python3 -m unittest discover -s tools/verification -p 'test_inflight_model.py' -v
