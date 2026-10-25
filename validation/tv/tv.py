@@ -6,7 +6,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-ROOT = Path('/tmp/moonshine-tv-validation')
+ROOT = Path('/home/repparw/Projects/moonshine-tv-validation')
 CONF = '/media/developer/apps/usr/palm/applications/com.limelight.webos/conf/'
 
 def remote(command):
