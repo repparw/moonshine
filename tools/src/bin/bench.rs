@@ -844,6 +844,32 @@ fn print_matrix_summary(reports: &[MatrixReport]) {
 		}
 	}
 
+	tracing::info!("Hardware timing (us/frame): GPU timestamp samples only; unavailable means unsupported, not zero");
+	tracing::info!(
+		"  {:<8} {:<10} {:>6} {:<5} {:>8} {:>20} {:>20}",
+		"label", "resolution", "target", "codec", "samples", "gpu avg/p50/p95", "ready avg/p50/p95"
+	);
+	for report in reports {
+		if let MatrixStatus::Ok(Some(summary)) | MatrixStatus::Interrupted(Some(summary)) = &report.status {
+			let format_timing = |distribution: &Option<LatencyDistribution>| {
+				distribution.as_ref().map_or_else(
+					|| "unavailable".to_string(),
+					|d| format!("{:.0}/{}/{}", d.avg_us, d.p50_us, d.p95_us),
+				)
+			};
+			tracing::info!(
+				"  {:<8} {:<10} {:>6} {:<5} {:>8} {:>20} {:>20}",
+				report.resolution_label,
+				report.resolution,
+				report.target_fps,
+				report.codec,
+				summary.gpu_timing_samples,
+				format_timing(&summary.gpu_encode),
+				format_timing(&summary.bitstream_ready),
+			);
+		}
+	}
+
 	tracing::info!(
 		"Average pipeline breakdown (us/frame): additive stages; delta = total - accounted; queue_diag is included in enc_wait"
 	);
