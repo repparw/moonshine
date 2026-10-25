@@ -847,7 +847,13 @@ fn print_matrix_summary(reports: &[MatrixReport]) {
 	tracing::info!("Hardware timing (us/frame): GPU timestamp samples only; unavailable means unsupported, not zero");
 	tracing::info!(
 		"  {:<8} {:<10} {:>6} {:<5} {:>8} {:>20} {:>20}",
-		"label", "resolution", "target", "codec", "samples", "gpu avg/p50/p95", "ready avg/p50/p95"
+		"label",
+		"resolution",
+		"target",
+		"codec",
+		"samples",
+		"gpu avg/p50/p95",
+		"ready avg/p50/p95"
 	);
 	for report in reports {
 		if let MatrixStatus::Ok(Some(summary)) | MatrixStatus::Interrupted(Some(summary)) = &report.status {
