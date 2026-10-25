@@ -1,0 +1,16 @@
+{
+  "hosts.ini": {
+    "restored_byte_for_byte": true,
+    "sha256": "268274c1935cbfcd573c0d0d083b23facc48d0bd03d1afdf5782eb2a92af1e89"
+  },
+  "moonlight.ini": {
+    "restored_byte_for_byte": true,
+    "sha256": "bb168848cbb7e88f9a8be4736e5d5d2a7d40f2d59c0650215f4ba609f46ae307"
+  },
+  "mute": {
+    "returnValue": true,
+    "muteStatus": true,
+    "volume": 7,
+    "scenario": "mastervolume_tv_speaker"
+  }
+}

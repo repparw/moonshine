@@ -60,26 +60,36 @@ grew. This does not establish a throughput improvement. Do not call enc_wait
 hardware encoding time, subtract percentiles, or conflate packet enqueue with
 bitstream ready or display. PR #230 timestamp semantics match across this A/B.
 
-## Remaining runtime work
+## TV continuation and remaining runtime work
 
-The LG C3 is now authorized for tests and **confirmed muted**, volume setting 7
-unchanged. No TV session has been launched. Production Moonshine remains PID
-3458425 with no drop-ins; no NixOS configuration or service activation changed.
-Standalone candidate server compiled but was not launched. During TV preparation
-Alpha had unrelated Chromium/Qt Nix builds and load average over 50 on 12 logical
-CPUs; do not present tests under that contention as clean performance evidence.
+Read [tv/REPORT.md](tv/REPORT.md) and its evidence first. Thirteen controlled TV
+cases have now completed, including real active-session resume, with no uptime
+reset or host ERROR/unexpected-stop lines. Settings were restored byte-for-byte,
+all private servers stopped, TV mute verified. Earlier uncontrolled resets
+overlapped another session's launcher work and are quarantined, not attributed
+to this change. One configured 1440p HDR run showed plain H265 in the overlay;
+a clean repeat confirmed Main10. Investigate that discrepancy before treating
+the HDR flag alone as profile validation. Physical video-plane visual checks,
+exceptional GPU failures and dedicated idle-frame IDR re-encode remain open.
 
-A private real-server plan avoids production interference: use available ports
+Production Moonshine remains PID 3458425 with no drop-ins; no NixOS configuration
+or service activation changed. During TV preparation Alpha had unrelated
+Chromium/Qt builds and load average over 50 on 12 logical CPUs. Load fell during
+tests but varied; do not present these short, sequential diagnostics as matched
+performance evidence. The full Nix package/vendor build was not validated;
+independently verify the changed ash output-hash key and hash before packaging.
+
+The tested private real-server configuration used ports
 1717 HTTP, 1718 HTTPS, 1719 RTSP, 1720 video, 1721 control, 1722 audio. They are
 inside the **already deployed** eth0 1714–1764 TCP/UDP allow ranges. Do not edit
 the firewall or replace production. Use an isolated XDG_DATA_HOME and copied
 pairing state/new host UUID, read the existing certificate paths without exposing
 private keys, and back up/restore TV hosts.ini and moonlight.ini before edits.
-No such TV configuration edits have happened yet. Preserve decoder settings;
+Preserve decoder settings;
 vary only requested resolution/HDR and keep 150 Mbps. Verify mute before/after.
 
-Still missing: real TV decode/drop statistics and playback inspection, TV
-disconnect/reconnect, actual GPU submission errors/device loss, dedicated runtime
+Still missing: physical playback inspection, actual GPU submission errors/device
+loss, dedicated idle-frame runtime
 IDR re-encode exercise, exact capture-to-bitstream-ready distributions, GPU
 conversion timestamps, compositor tick/GBM pool occupancy and capture skips.
 Do not waive a concrete ownership defect because performance is not the goal.
