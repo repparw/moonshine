@@ -42,6 +42,12 @@ def main(argv=None):
             print(json.dumps({"mode": "DRY_RUN", "command": command, "warning": "This only requests Moonlight launch; it does not prove a video stream"}, indent=2))
             return 0
 
+    # Reject incomplete control requests before even querying the device.
+    if args.action == "start" and (not args.confirm or args.out is None):
+        parser.error("start requires --confirm and --out (no implicit TV control)")
+    if args.action == "collect" and args.out is None:
+        parser.error("collect requires --out")
+
     if not shutil.which("ares-launch"):
         print("ares-launch missing; install/configure webOS TV CLI first", file=sys.stderr)
         return 2
@@ -68,8 +74,6 @@ def main(argv=None):
         dest.write_text(status.stdout)
         print(json.dumps({"running": is_running, "evidence": str(dest), "stream_verified": False}, indent=2))
         return 0
-    if not args.confirm or args.out is None:
-        parser.error("start requires --confirm and --out (no implicit TV control)")
     if is_running:
         print("Moonlight is already running: refusing to interrupt an active client", file=sys.stderr)
         return 2
