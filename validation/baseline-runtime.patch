@@ -1,0 +1,245 @@
+diff --git i/src/session/mod.rs w/src/session/mod.rs
+index 6308401..e48f0a4 100644
+--- i/src/session/mod.rs
++++ w/src/session/mod.rs
+@@ -202,7 +202,7 @@ impl InitializedSession {
+ 		let application = Application::spawn(
+ 			context.application.clone(),
+ 			ApplicationContext {
+-				unit_name: "moonshine-session.service".to_string(),
++				unit_name: format!("moonshine-async-validation-{}.service", std::process::id()),
+ 				pulse_socket_path,
+ 				xdisplay: ready.xdisplay,
+ 				wayland_display: ready.wayland_display.clone(),
+diff --git i/src/session/stream/audio/mod.rs w/src/session/stream/audio/mod.rs
+index 53ee4b6..c5e42c3 100644
+--- i/src/session/stream/audio/mod.rs
++++ w/src/session/stream/audio/mod.rs
+@@ -306,7 +306,7 @@ impl AudioStream {
+ 		// Create the socket directory for the PulseAudio server.
+ 		let pulse_socket_dir = dirs::runtime_dir()
+ 			.ok_or_else(|| tracing::error!("Failed to get runtime directory for PulseAudio socket"))?
+-			.join("moonshine/pulse");
++			.join(format!("moonshine-async-validation-{}/pulse", std::process::id()));
+ 		std::fs::create_dir_all(&pulse_socket_dir)
+ 			.map_err(|e| tracing::error!("Failed to create pulse socket directory: {e}"))?;
+ 		let pulse_socket_path = pulse_socket_dir.join("native");
+diff --git i/src/session/stream/video/pipeline/mod.rs w/src/session/stream/video/pipeline/mod.rs
+index b05870b..1aaafc2 100644
+--- i/src/session/stream/video/pipeline/mod.rs
++++ w/src/session/stream/video/pipeline/mod.rs
+@@ -110,10 +110,30 @@ fn is_device_lost(e: &PixelForgeError) -> bool {
+ 	}
+ }
+ 
++fn log_conversion_profile(samples: &[(u64, u64)]) {
++	let mut slots: Vec<_> = samples.iter().map(|s| s.0).collect();
++	let mut calls: Vec<_> = samples.iter().map(|s| s.1).collect();
++	slots.sort_unstable();
++	calls.sort_unstable();
++	let percentile = |v: &[u64], p: f64| v[(v.len() as f64 * p) as usize];
++	tracing::debug!(
++		samples = samples.len(),
++		input_slot_p50_us = percentile(&slots, 0.50),
++		input_slot_p95_us = percentile(&slots, 0.95),
++		input_slot_p99_us = percentile(&slots, 0.99),
++		converter_call_p50_us = percentile(&calls, 0.50),
++		converter_call_p95_us = percentile(&calls, 0.95),
++		converter_call_p99_us = percentile(&calls, 0.99),
++		"Validation conversion profile (us)"
++	);
++}
++
+ pub(crate) struct VideoPipeline {}
+ 
+ /// A single frame's latency breakdown for periodic summary reporting.
+ struct LatencySample {
++	gpu_us: Option<u64>,
++	gpu_wall_us: Option<u64>,
+ 	channel_wait: std::time::Duration,
+ 	import: std::time::Duration,
+ 	convert: std::time::Duration,
+@@ -140,6 +160,27 @@ fn log_latency_summary(samples: &[LatencySample], elapsed: std::time::Duration)
+ 	let elapsed_s = elapsed.as_secs_f64().max(f64::EPSILON);
+ 	let bytes_total: usize = samples.iter().map(|s| s.encoded_bytes).sum();
+ 	let keyframes = samples.iter().filter(|s| s.is_key_frame).count();
++	let mut gpu: Vec<_> = samples.iter().filter_map(|s| s.gpu_us).collect();
++	let mut wall: Vec<_> = samples.iter().filter_map(|s| s.gpu_wall_us).collect();
++	gpu.sort_unstable();
++	wall.sort_unstable();
++	let percentile = |v: &[u64], p: f64| {
++		if v.is_empty() {
++			0
++		} else {
++			v[(v.len() as f64 * p) as usize]
++		}
++	};
++	tracing::debug!(
++		samples = gpu.len(),
++		gpu_encode_p50_us = percentile(&gpu, 0.50),
++		gpu_encode_p95_us = percentile(&gpu, 0.95),
++		gpu_encode_p99_us = percentile(&gpu, 0.99),
++		encode_wall_p50_us = percentile(&wall, 0.50),
++		encode_wall_p95_us = percentile(&wall, 0.95),
++		encode_wall_p99_us = percentile(&wall, 0.99),
++		"Validation GPU profile (us; zero samples means unavailable)"
++	);
+ 
+ 	let mut totals: Vec<u64> = samples.iter().map(|s| s.total.as_micros() as u64).collect();
+ 	totals.sort_unstable();
+@@ -338,6 +379,15 @@ async fn run_packet_consumer(
+ 			packet.data = hdr_sei::inject_hdr_metadata(&packet.data, &m, ctx.video_format);
+ 		}
+ 
++		if let Some(path) = std::env::var_os("MOONSHINE_VALIDATION_DUMP") {
++			let mut file = std::fs::OpenOptions::new()
++				.create(true)
++				.append(true)
++				.open(path)
++				.expect("validation bitstream output");
++			std::io::Write::write_all(&mut file, &packet.data).expect("validation bitstream write");
++		}
++
+ 		let encoded_bytes = packet.data.len();
+ 		let is_key_frame = packet.is_key_frame;
+ 
+@@ -417,6 +467,8 @@ async fn run_packet_consumer(
+ 		}
+ 
+ 		latency_samples.push(LatencySample {
++			gpu_us: packet.stats.as_ref().map(|s| s.gpu_time_ns / 1000),
++			gpu_wall_us: packet.stats.as_ref().map(|s| s.wall_latency_ns / 1000),
+ 			channel_wait: frame_context.channel_wait,
+ 			import: frame_context.import,
+ 			convert: frame_context.convert,
+@@ -580,6 +632,7 @@ impl VideoPipelineInner {
+ 
+ 		// Create Vulkan video context.
+ 		let context = VideoContextBuilder::new()
++			.enable_validation(std::env::var_os("MOONSHINE_VALIDATION_VULKAN").is_some())
+ 			.build()
+ 			.map_err(|e| format!("Failed to create video context: {e}"))?;
+ 
+@@ -708,6 +761,12 @@ impl VideoPipelineInner {
+ 
+ 		// Rate-limits the drop-to-catch-up warning.
+ 		let mut last_drop_warn: Option<std::time::Instant> = None;
++		let mut admission_drops = 0u64;
++		let mut in_flight_max = 0usize;
++		let mut source_max = 0usize;
++		let mut backpressure_started = std::time::Instant::now();
++		let mut conversion_profile = Vec::with_capacity(512);
++		let mut conversion_profile_started = std::time::Instant::now();
+ 
+ 		// Determine output YUV format based on chroma sampling and dynamic range.
+ 		let color_range = if ctx.full_range {
+@@ -766,6 +825,18 @@ impl VideoPipelineInner {
+ 		});
+ 
+ 		while !stop_session_manager.is_shutdown_triggered() {
++			in_flight_max = in_flight_max.max(in_flight.load(Ordering::Relaxed));
++			source_max = source_max.max(0usize);
++			if backpressure_started.elapsed() >= std::time::Duration::from_secs(5) {
++				tracing::debug!(
++					admission_drops,
++					in_flight_max,
++					source_max,
++					"Validation backpressure (cumulative drops; producer sources are not total pool occupancy)"
++				);
++				backpressure_started = std::time::Instant::now();
++			}
++
+ 			let mut pending_idr = false;
+ 
+ 			// Drain any pending stream-reset requests (client reconnect/resume).
+@@ -894,6 +965,7 @@ impl VideoPipelineInner {
+ 				// the encoder's reference state). The IDR re-encode path is never
+ 				// gated — the client needs that keyframe.
+ 				if in_flight.load(Ordering::Relaxed) >= MAX_FRAMES_IN_FLIGHT {
++					admission_drops += 1;
+ 					if last_drop_warn.is_none_or(|t| t.elapsed() >= std::time::Duration::from_secs(1)) {
+ 						tracing::warn!(
+ 							"Video encode backpressure: packet consumer is behind; dropping captured \
+@@ -1059,7 +1131,11 @@ impl VideoPipelineInner {
+ 				*cached_source = Some(Arc::clone(&source_import));
+ 
+ 				// Convert to YUV.
+-				if let Err(e) = converter.convert(source_image, src_layout, encoder.input_image()) {
++				let input_slot_started = std::time::Instant::now();
++				let input_image = encoder.input_image();
++				let input_slot_us = input_slot_started.elapsed().as_micros() as u64;
++				let converter_call_started = std::time::Instant::now();
++				if let Err(e) = converter.convert(source_image, src_layout, input_image) {
+ 					if is_device_lost(&e) {
+ 						return Err(format!("GPU color conversion failed: {e}"));
+ 					}
+@@ -1067,6 +1143,13 @@ impl VideoPipelineInner {
+ 					continue;
+ 				}
+ 
++				conversion_profile.push((input_slot_us, converter_call_started.elapsed().as_micros() as u64));
++				if conversion_profile_started.elapsed() >= std::time::Duration::from_secs(5) {
++					log_conversion_profile(&conversion_profile);
++					conversion_profile.clear();
++					conversion_profile_started = std::time::Instant::now();
++				}
++
+ 				// The DMA-BUF content has been read into the encoder's input
+ 				// image: dropping the frame returns its buffer to the compositor.
+ 				let frame_hdr_metadata = hdr_metadata(&frame.info.colour);
+@@ -1152,6 +1235,13 @@ impl VideoPipelineInner {
+ 			}
+ 		}
+ 
++		tracing::debug!(
++			admission_drops,
++			in_flight_max,
++			source_max,
++			"Validation final backpressure"
++		);
++
+ 		// Drain in-flight encodes (barrier so every packet reaches the channel),
+ 		// then stop the consumer and wait for it to send the remaining packets.
+ 		if let Err(e) = encoder.flush() {
+diff --git i/tools/src/bin/bench.rs w/tools/src/bin/bench.rs
+index 1ad769e..55deadc 100644
+--- i/tools/src/bin/bench.rs
++++ w/tools/src/bin/bench.rs
+@@ -25,7 +25,7 @@ use tokio::signal;
+ use tracing_subscriber::{EnvFilter, layer::SubscriberExt, util::SubscriberInitExt};
+ 
+ #[derive(Parser, Debug)]
+-#[command(name = "moonshine-bench", about = "Benchmark Moonshine's encoding pipeline")]
++#[command(name = "moonshine-bench", about = "Isolated Moonshine async validation benchmark")]
+ struct Args {
+ 	/// Command to run (application to spawn).
+ 	command: Vec<String>,
+@@ -534,7 +534,7 @@ async fn run_benchmark(
+ 	let shutdown = ShutdownManager::<ShutdownReason>::new();
+ 	let session_manager = SessionManager::new(
+ 		CompositorConfig::default(),
+-		VideoStreamConfig::default(),
++		VideoStreamConfig { port: 57998, ..Default::default() },
+ 		AudioStreamConfig { port: 0 },
+ 		ControlStreamConfig {
+ 			port: 0,
+@@ -550,7 +550,9 @@ async fn run_benchmark(
+ 	let mut stats_rx = session_manager.bench_stats_receiver();
+ 
+ 	let app_config = ApplicationConfig {
+-		title: "bench".to_string(),
++		title: "async-validation".to_string(),
++		stdout: Some("journal".to_string()),
++		stderr: Some("journal".to_string()),
+ 		command: args.command.clone(),
+ 		..Default::default()
+ 	};
+@@ -626,7 +628,7 @@ async fn run_benchmark(
+ 	// Send PING to the video socket so the packet handler learns the client
+ 	// address and actually transmits encoded frames over UDP (otherwise all
+ 	// packets are silently dropped waiting for a Moonlight client to connect).
+-	let ping_addr: std::net::SocketAddr = "127.0.0.1:47998".parse().unwrap();
++	let ping_addr: std::net::SocketAddr = "127.0.0.1:57998".parse().unwrap();
+ 	if let Ok(ping_sock) = UdpSocket::bind("127.0.0.1:0") {
+ 		let _ = ping_sock.send_to(b"PING", ping_addr);
+ 		tracing::debug!("Sent PING to video socket at {ping_addr}");

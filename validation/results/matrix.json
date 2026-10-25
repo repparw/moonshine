@@ -1,0 +1,3842 @@
+[
+  {
+    "name": "2560x1440-hdr-1-baseline",
+    "frames": 900,
+    "fps": 60.1,
+    "mbps": 150.15,
+    "total": {
+      "avg_us": 8859,
+      "p50_us": 8704,
+      "p95_us": 9827,
+      "p99_us": 12360
+    },
+    "submit": {
+      "avg_us": 99,
+      "p50_us": 95,
+      "p95_us": 137,
+      "p99_us": 204
+    },
+    "enc_wait": {
+      "avg_us": 6868,
+      "p50_us": 6846,
+      "p95_us": 7292,
+      "p99_us": 9110
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 4,
+        "converter_call_p50_us": 1671,
+        "converter_call_p95_us": 2233,
+        "converter_call_p99_us": 2727
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 1656,
+        "converter_call_p95_us": 2159,
+        "converter_call_p99_us": 2821
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 1677,
+        "converter_call_p95_us": 2128,
+        "converter_call_p99_us": 2361
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 302,
+        "gpu_encode_p50_us": 4700,
+        "gpu_encode_p95_us": 4930,
+        "gpu_encode_p99_us": 4958,
+        "encode_wall_p50_us": 6758,
+        "encode_wall_p95_us": 7114,
+        "encode_wall_p99_us": 9803
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 4837,
+        "gpu_encode_p95_us": 4941,
+        "gpu_encode_p99_us": 5230,
+        "encode_wall_p50_us": 6820,
+        "encode_wall_p95_us": 7431,
+        "encode_wall_p99_us": 9289
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 4592,
+        "gpu_encode_p95_us": 5286,
+        "gpu_encode_p99_us": 5349,
+        "encode_wall_p50_us": 6666,
+        "encode_wall_p95_us": 7479,
+        "encode_wall_p99_us": 8258
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 0
+    },
+    "passthrough_events": 1,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 30,
+      "min": 0,
+      "max": 51
+    },
+    "process_cpu_percent_steady": 27.02276003820298,
+    "system_cpu_percent_steady": 15.224161231564722
+  },
+  {
+    "name": "2560x1440-hdr-1-candidate",
+    "frames": 900,
+    "fps": 60.1,
+    "mbps": 150.14,
+    "total": {
+      "avg_us": 8681,
+      "p50_us": 8560,
+      "p95_us": 9287,
+      "p99_us": 11943
+    },
+    "submit": {
+      "avg_us": 63,
+      "p50_us": 60,
+      "p95_us": 75,
+      "p99_us": 129
+    },
+    "enc_wait": {
+      "avg_us": 8224,
+      "p50_us": 8128,
+      "p95_us": 8757,
+      "p99_us": 10181
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 111,
+        "converter_call_p95_us": 147,
+        "converter_call_p99_us": 228
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 108,
+        "converter_call_p95_us": 152,
+        "converter_call_p99_us": 290
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 107,
+        "converter_call_p95_us": 140,
+        "converter_call_p99_us": 210
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 4589,
+        "gpu_encode_p95_us": 4927,
+        "gpu_encode_p99_us": 5264,
+        "encode_wall_p50_us": 8070,
+        "encode_wall_p95_us": 8981,
+        "encode_wall_p99_us": 10760
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 4843,
+        "gpu_encode_p95_us": 4932,
+        "gpu_encode_p99_us": 5243,
+        "encode_wall_p50_us": 8129,
+        "encode_wall_p95_us": 9254,
+        "encode_wall_p99_us": 10499
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 4830,
+        "gpu_encode_p95_us": 5352,
+        "gpu_encode_p99_us": 5466,
+        "encode_wall_p50_us": 8115,
+        "encode_wall_p95_us": 9356,
+        "encode_wall_p99_us": 9546
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 1,
+      "source_max": 1
+    },
+    "passthrough_events": 1,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 35,
+      "min": 0,
+      "max": 58
+    },
+    "process_cpu_percent_steady": 27.032771071586236,
+    "system_cpu_percent_steady": 15.165120812902463
+  },
+  {
+    "name": "2560x1440-hdr-2-baseline",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 150.1,
+    "total": {
+      "avg_us": 8943,
+      "p50_us": 8739,
+      "p95_us": 9885,
+      "p99_us": 12543
+    },
+    "submit": {
+      "avg_us": 111,
+      "p50_us": 108,
+      "p95_us": 147,
+      "p99_us": 340
+    },
+    "enc_wait": {
+      "avg_us": 6833,
+      "p50_us": 6791,
+      "p95_us": 7233,
+      "p99_us": 8613
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 4,
+        "converter_call_p50_us": 1710,
+        "converter_call_p95_us": 2316,
+        "converter_call_p99_us": 3090
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 1670,
+        "converter_call_p95_us": 2262,
+        "converter_call_p99_us": 2745
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 6,
+        "converter_call_p50_us": 1674,
+        "converter_call_p95_us": 2160,
+        "converter_call_p99_us": 2855
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 4595,
+        "gpu_encode_p95_us": 4904,
+        "gpu_encode_p99_us": 4945,
+        "encode_wall_p50_us": 6781,
+        "encode_wall_p95_us": 7408,
+        "encode_wall_p99_us": 8892
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 4831,
+        "gpu_encode_p95_us": 4909,
+        "gpu_encode_p99_us": 4945,
+        "encode_wall_p50_us": 6802,
+        "encode_wall_p95_us": 7555,
+        "encode_wall_p99_us": 8621
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 4828,
+        "gpu_encode_p95_us": 4918,
+        "gpu_encode_p99_us": 5287,
+        "encode_wall_p50_us": 6803,
+        "encode_wall_p95_us": 7292,
+        "encode_wall_p99_us": 9943
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 0
+    },
+    "passthrough_events": 1,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 27,
+      "min": 0,
+      "max": 53
+    },
+    "process_cpu_percent_steady": 27.44609701034202,
+    "system_cpu_percent_steady": 17.523157708419376
+  },
+  {
+    "name": "2560x1440-hdr-2-candidate",
+    "frames": 900,
+    "fps": 60.1,
+    "mbps": 150.15,
+    "total": {
+      "avg_us": 8928,
+      "p50_us": 8698,
+      "p95_us": 9757,
+      "p99_us": 12808
+    },
+    "submit": {
+      "avg_us": 71,
+      "p50_us": 67,
+      "p95_us": 86,
+      "p99_us": 133
+    },
+    "enc_wait": {
+      "avg_us": 8350,
+      "p50_us": 8178,
+      "p95_us": 9042,
+      "p99_us": 10389
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 108,
+        "converter_call_p95_us": 145,
+        "converter_call_p99_us": 265
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 118,
+        "converter_call_p95_us": 172,
+        "converter_call_p99_us": 269
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 2,
+        "converter_call_p50_us": 118,
+        "converter_call_p95_us": 154,
+        "converter_call_p99_us": 241
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 4604,
+        "gpu_encode_p95_us": 4925,
+        "gpu_encode_p99_us": 4957,
+        "encode_wall_p50_us": 8140,
+        "encode_wall_p95_us": 9050,
+        "encode_wall_p99_us": 10471
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 4652,
+        "gpu_encode_p95_us": 4942,
+        "gpu_encode_p99_us": 5264,
+        "encode_wall_p50_us": 8169,
+        "encode_wall_p95_us": 9027,
+        "encode_wall_p99_us": 11487
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 4833,
+        "gpu_encode_p95_us": 4929,
+        "gpu_encode_p99_us": 5422,
+        "encode_wall_p50_us": 8154,
+        "encode_wall_p95_us": 9011,
+        "encode_wall_p99_us": 11626
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 1
+    },
+    "passthrough_events": 1,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 24,
+      "min": 0,
+      "max": 50
+    },
+    "process_cpu_percent_steady": 28.815122835848253,
+    "system_cpu_percent_steady": 33.057369402985074
+  },
+  {
+    "name": "2560x1440-hdr-3-baseline",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 150.12,
+    "total": {
+      "avg_us": 8892,
+      "p50_us": 8723,
+      "p95_us": 9602,
+      "p99_us": 12550
+    },
+    "submit": {
+      "avg_us": 115,
+      "p50_us": 111,
+      "p95_us": 157,
+      "p99_us": 402
+    },
+    "enc_wait": {
+      "avg_us": 6775,
+      "p50_us": 6700,
+      "p95_us": 7095,
+      "p99_us": 8660
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 4,
+        "converter_call_p50_us": 1679,
+        "converter_call_p95_us": 2276,
+        "converter_call_p99_us": 2989
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 4,
+        "converter_call_p50_us": 1667,
+        "converter_call_p95_us": 2259,
+        "converter_call_p99_us": 4041
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 4,
+        "converter_call_p50_us": 1664,
+        "converter_call_p95_us": 1755,
+        "converter_call_p99_us": 2882
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 4811,
+        "gpu_encode_p95_us": 4911,
+        "gpu_encode_p99_us": 4958,
+        "encode_wall_p50_us": 6743,
+        "encode_wall_p95_us": 7013,
+        "encode_wall_p99_us": 8454
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 4598,
+        "gpu_encode_p95_us": 4913,
+        "gpu_encode_p99_us": 4952,
+        "encode_wall_p50_us": 6678,
+        "encode_wall_p95_us": 7269,
+        "encode_wall_p99_us": 8653
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 4846,
+        "gpu_encode_p95_us": 4912,
+        "gpu_encode_p99_us": 4941,
+        "encode_wall_p50_us": 6836,
+        "encode_wall_p95_us": 7090,
+        "encode_wall_p99_us": 8496
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 1,
+      "source_max": 0
+    },
+    "passthrough_events": 1,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 30,
+      "min": 0,
+      "max": 53
+    },
+    "process_cpu_percent_steady": 27.17253501913405,
+    "system_cpu_percent_steady": 15.169332079021636
+  },
+  {
+    "name": "2560x1440-hdr-3-candidate",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 150.03,
+    "total": {
+      "avg_us": 8725,
+      "p50_us": 8556,
+      "p95_us": 9419,
+      "p99_us": 12138
+    },
+    "submit": {
+      "avg_us": 64,
+      "p50_us": 62,
+      "p95_us": 80,
+      "p99_us": 134
+    },
+    "enc_wait": {
+      "avg_us": 8255,
+      "p50_us": 8112,
+      "p95_us": 8960,
+      "p99_us": 10340
+    },
+    "conversion_windows": [
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 106,
+        "converter_call_p95_us": 141,
+        "converter_call_p99_us": 224
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 105,
+        "converter_call_p95_us": 138,
+        "converter_call_p99_us": 293
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 106,
+        "converter_call_p95_us": 141,
+        "converter_call_p99_us": 263
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 4839,
+        "gpu_encode_p95_us": 4913,
+        "gpu_encode_p99_us": 4956,
+        "encode_wall_p50_us": 8112,
+        "encode_wall_p95_us": 8494,
+        "encode_wall_p99_us": 10069
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 4597,
+        "gpu_encode_p95_us": 4930,
+        "gpu_encode_p99_us": 4964,
+        "encode_wall_p50_us": 8095,
+        "encode_wall_p95_us": 8974,
+        "encode_wall_p99_us": 11301
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 4794,
+        "gpu_encode_p95_us": 4950,
+        "gpu_encode_p99_us": 5229,
+        "encode_wall_p50_us": 8144,
+        "encode_wall_p95_us": 9167,
+        "encode_wall_p99_us": 9931
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 1,
+      "source_max": 1
+    },
+    "passthrough_events": 1,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 30,
+      "min": 0,
+      "max": 51
+    },
+    "process_cpu_percent_steady": 26.958486689902937,
+    "system_cpu_percent_steady": 15.040817525107183
+  },
+  {
+    "name": "2560x1440-hdr-4-baseline",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 150.09,
+    "total": {
+      "avg_us": 8823,
+      "p50_us": 8729,
+      "p95_us": 9227,
+      "p99_us": 12518
+    },
+    "submit": {
+      "avg_us": 104,
+      "p50_us": 103,
+      "p95_us": 129,
+      "p99_us": 231
+    },
+    "enc_wait": {
+      "avg_us": 6830,
+      "p50_us": 6834,
+      "p95_us": 7079,
+      "p99_us": 8614
+    },
+    "conversion_windows": [
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 1657,
+        "converter_call_p95_us": 1737,
+        "converter_call_p99_us": 4158
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 1663,
+        "converter_call_p95_us": 1811,
+        "converter_call_p99_us": 3654
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 1665,
+        "converter_call_p95_us": 2193,
+        "converter_call_p99_us": 2980
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 4843,
+        "gpu_encode_p95_us": 4912,
+        "gpu_encode_p99_us": 4948,
+        "encode_wall_p50_us": 6822,
+        "encode_wall_p95_us": 7040,
+        "encode_wall_p99_us": 8218
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 4837,
+        "gpu_encode_p95_us": 4924,
+        "gpu_encode_p99_us": 4950,
+        "encode_wall_p50_us": 6825,
+        "encode_wall_p95_us": 7305,
+        "encode_wall_p99_us": 8985
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 4615,
+        "gpu_encode_p95_us": 4919,
+        "gpu_encode_p99_us": 4945,
+        "encode_wall_p50_us": 6678,
+        "encode_wall_p95_us": 7128,
+        "encode_wall_p99_us": 8382
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 1,
+      "source_max": 0
+    },
+    "passthrough_events": 1,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 30,
+      "min": 0,
+      "max": 50
+    },
+    "process_cpu_percent_steady": 27.174882106130934,
+    "system_cpu_percent_steady": 14.669494521032167
+  },
+  {
+    "name": "2560x1440-hdr-4-candidate",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 150.09,
+    "total": {
+      "avg_us": 8781,
+      "p50_us": 8552,
+      "p95_us": 9866,
+      "p99_us": 13252
+    },
+    "submit": {
+      "avg_us": 65,
+      "p50_us": 64,
+      "p95_us": 96,
+      "p99_us": 134
+    },
+    "enc_wait": {
+      "avg_us": 8299,
+      "p50_us": 8120,
+      "p95_us": 9380,
+      "p99_us": 11560
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 104,
+        "converter_call_p95_us": 139,
+        "converter_call_p99_us": 239
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 4,
+        "converter_call_p50_us": 105,
+        "converter_call_p95_us": 155,
+        "converter_call_p99_us": 273
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 105,
+        "converter_call_p95_us": 146,
+        "converter_call_p99_us": 241
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 302,
+        "gpu_encode_p50_us": 4828,
+        "gpu_encode_p95_us": 5358,
+        "gpu_encode_p99_us": 5439,
+        "encode_wall_p50_us": 8110,
+        "encode_wall_p95_us": 9371,
+        "encode_wall_p99_us": 10642
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 4829,
+        "gpu_encode_p95_us": 4928,
+        "gpu_encode_p99_us": 5386,
+        "encode_wall_p50_us": 8117,
+        "encode_wall_p95_us": 9288,
+        "encode_wall_p99_us": 12051
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 4591,
+        "gpu_encode_p95_us": 5263,
+        "gpu_encode_p99_us": 5347,
+        "encode_wall_p50_us": 8091,
+        "encode_wall_p95_us": 9101,
+        "encode_wall_p99_us": 11463
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 1
+    },
+    "passthrough_events": 1,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 30,
+      "min": 0,
+      "max": 50
+    },
+    "process_cpu_percent_steady": 26.957811708246076,
+    "system_cpu_percent_steady": 16.170137455017404
+  },
+  {
+    "name": "2560x1440-hdr-5-baseline",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 150.12,
+    "total": {
+      "avg_us": 8923,
+      "p50_us": 8807,
+      "p95_us": 10265,
+      "p99_us": 12546
+    },
+    "submit": {
+      "avg_us": 109,
+      "p50_us": 109,
+      "p95_us": 151,
+      "p99_us": 215
+    },
+    "enc_wait": {
+      "avg_us": 6846,
+      "p50_us": 6822,
+      "p95_us": 7378,
+      "p99_us": 9146
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 1668,
+        "converter_call_p95_us": 2094,
+        "converter_call_p99_us": 2834
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 1659,
+        "converter_call_p95_us": 2265,
+        "converter_call_p99_us": 2864
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 1669,
+        "converter_call_p95_us": 2233,
+        "converter_call_p99_us": 2661
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 302,
+        "gpu_encode_p50_us": 4818,
+        "gpu_encode_p95_us": 5270,
+        "gpu_encode_p99_us": 5331,
+        "encode_wall_p50_us": 6738,
+        "encode_wall_p95_us": 7402,
+        "encode_wall_p99_us": 8150
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 4838,
+        "gpu_encode_p95_us": 4921,
+        "gpu_encode_p99_us": 4967,
+        "encode_wall_p50_us": 6820,
+        "encode_wall_p95_us": 7709,
+        "encode_wall_p99_us": 9265
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 4833,
+        "gpu_encode_p95_us": 4920,
+        "gpu_encode_p99_us": 4961,
+        "encode_wall_p50_us": 6809,
+        "encode_wall_p95_us": 7231,
+        "encode_wall_p99_us": 9164
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 0
+    },
+    "passthrough_events": 1,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 30,
+      "min": 0,
+      "max": 49
+    },
+    "process_cpu_percent_steady": 27.668178185475607,
+    "system_cpu_percent_steady": 18.428504011326098
+  },
+  {
+    "name": "2560x1440-hdr-5-candidate",
+    "frames": 900,
+    "fps": 60.1,
+    "mbps": 150.15,
+    "total": {
+      "avg_us": 8781,
+      "p50_us": 8549,
+      "p95_us": 9900,
+      "p99_us": 12297
+    },
+    "submit": {
+      "avg_us": 63,
+      "p50_us": 60,
+      "p95_us": 77,
+      "p99_us": 131
+    },
+    "enc_wait": {
+      "avg_us": 8301,
+      "p50_us": 8120,
+      "p95_us": 9421,
+      "p99_us": 10104
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 104,
+        "converter_call_p95_us": 135,
+        "converter_call_p99_us": 252
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 105,
+        "converter_call_p95_us": 171,
+        "converter_call_p99_us": 284
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 105,
+        "converter_call_p95_us": 143,
+        "converter_call_p99_us": 272
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 302,
+        "gpu_encode_p50_us": 4610,
+        "gpu_encode_p95_us": 5342,
+        "gpu_encode_p99_us": 5370,
+        "encode_wall_p50_us": 8129,
+        "encode_wall_p95_us": 9414,
+        "encode_wall_p99_us": 11129
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 4829,
+        "gpu_encode_p95_us": 5349,
+        "gpu_encode_p99_us": 5472,
+        "encode_wall_p50_us": 8130,
+        "encode_wall_p95_us": 9427,
+        "encode_wall_p99_us": 10706
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 4823,
+        "gpu_encode_p95_us": 4916,
+        "gpu_encode_p99_us": 5158,
+        "encode_wall_p50_us": 8172,
+        "encode_wall_p95_us": 8993,
+        "encode_wall_p99_us": 11131
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 1
+    },
+    "passthrough_events": 1,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 30,
+      "min": 0,
+      "max": 54
+    },
+    "process_cpu_percent_steady": 27.102253110594273,
+    "system_cpu_percent_steady": 16.575334393966177
+  },
+  {
+    "name": "3840x2160-hdr-1-baseline",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 154.41,
+    "total": {
+      "avg_us": 17310,
+      "p50_us": 17218,
+      "p95_us": 18352,
+      "p99_us": 21930
+    },
+    "submit": {
+      "avg_us": 92,
+      "p50_us": 81,
+      "p95_us": 130,
+      "p99_us": 255
+    },
+    "enc_wait": {
+      "avg_us": 11640,
+      "p50_us": 11494,
+      "p95_us": 12146,
+      "p99_us": 14649
+    },
+    "conversion_windows": [
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 5345,
+        "converter_call_p95_us": 5514,
+        "converter_call_p99_us": 5565
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 0,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 5391,
+        "converter_call_p95_us": 5502,
+        "converter_call_p99_us": 5579
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 0,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 5409,
+        "converter_call_p95_us": 5497,
+        "converter_call_p99_us": 5605
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9467,
+        "gpu_encode_p95_us": 9543,
+        "gpu_encode_p99_us": 9690,
+        "encode_wall_p50_us": 11503,
+        "encode_wall_p95_us": 12485,
+        "encode_wall_p99_us": 14424
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9470,
+        "gpu_encode_p95_us": 9542,
+        "gpu_encode_p99_us": 9690,
+        "encode_wall_p50_us": 11467,
+        "encode_wall_p95_us": 12085,
+        "encode_wall_p99_us": 14462
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9470,
+        "gpu_encode_p95_us": 9545,
+        "gpu_encode_p99_us": 9673,
+        "encode_wall_p50_us": 11469,
+        "encode_wall_p95_us": 11902,
+        "encode_wall_p99_us": 14857
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 0
+    },
+    "passthrough_events": 1,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 22,
+      "min": 0,
+      "max": 42
+    },
+    "process_cpu_percent_steady": 27.60374722313778,
+    "system_cpu_percent_steady": 16.095809792843692
+  },
+  {
+    "name": "3840x2160-hdr-1-candidate",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 154.41,
+    "total": {
+      "avg_us": 16567,
+      "p50_us": 16536,
+      "p95_us": 17154,
+      "p99_us": 19010
+    },
+    "submit": {
+      "avg_us": 65,
+      "p50_us": 60,
+      "p95_us": 94,
+      "p99_us": 140
+    },
+    "enc_wait": {
+      "avg_us": 16087,
+      "p50_us": 16120,
+      "p95_us": 16681,
+      "p99_us": 17937
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 107,
+        "converter_call_p95_us": 154,
+        "converter_call_p99_us": 228
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 4,
+        "converter_call_p50_us": 105,
+        "converter_call_p95_us": 173,
+        "converter_call_p99_us": 244
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 109,
+        "converter_call_p95_us": 178,
+        "converter_call_p99_us": 244
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9468,
+        "gpu_encode_p95_us": 9543,
+        "gpu_encode_p99_us": 9677,
+        "encode_wall_p50_us": 16168,
+        "encode_wall_p95_us": 16883,
+        "encode_wall_p99_us": 18265
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9468,
+        "gpu_encode_p95_us": 9545,
+        "gpu_encode_p99_us": 9684,
+        "encode_wall_p50_us": 16106,
+        "encode_wall_p95_us": 16682,
+        "encode_wall_p99_us": 17929
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9469,
+        "gpu_encode_p95_us": 9544,
+        "gpu_encode_p99_us": 9809,
+        "encode_wall_p50_us": 16115,
+        "encode_wall_p95_us": 16693,
+        "encode_wall_p99_us": 17776
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 1
+    },
+    "passthrough_events": 1,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 28,
+      "min": 0,
+      "max": 49
+    },
+    "process_cpu_percent_steady": 24.392410055261422,
+    "system_cpu_percent_steady": 17.999179991799917
+  },
+  {
+    "name": "3840x2160-hdr-2-baseline",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 154.38,
+    "total": {
+      "avg_us": 17242,
+      "p50_us": 17228,
+      "p95_us": 17820,
+      "p99_us": 21289
+    },
+    "submit": {
+      "avg_us": 82,
+      "p50_us": 78,
+      "p95_us": 118,
+      "p99_us": 200
+    },
+    "enc_wait": {
+      "avg_us": 11624,
+      "p50_us": 11519,
+      "p95_us": 11956,
+      "p99_us": 14027
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 5352,
+        "converter_call_p95_us": 5523,
+        "converter_call_p99_us": 5566
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 4,
+        "converter_call_p50_us": 5393,
+        "converter_call_p95_us": 5507,
+        "converter_call_p99_us": 5532
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 5390,
+        "converter_call_p95_us": 5497,
+        "converter_call_p99_us": 5540
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9469,
+        "gpu_encode_p95_us": 9547,
+        "gpu_encode_p99_us": 9848,
+        "encode_wall_p50_us": 11510,
+        "encode_wall_p95_us": 11957,
+        "encode_wall_p99_us": 14399
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9471,
+        "gpu_encode_p95_us": 9549,
+        "gpu_encode_p99_us": 9683,
+        "encode_wall_p50_us": 11497,
+        "encode_wall_p95_us": 12531,
+        "encode_wall_p99_us": 15645
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9470,
+        "gpu_encode_p95_us": 9538,
+        "gpu_encode_p99_us": 9686,
+        "encode_wall_p50_us": 11489,
+        "encode_wall_p95_us": 11875,
+        "encode_wall_p99_us": 14504
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 0
+    },
+    "passthrough_events": 1,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 28,
+      "min": 0,
+      "max": 47
+    },
+    "process_cpu_percent_steady": 28.175501546733233,
+    "system_cpu_percent_steady": 17.329159529856476
+  },
+  {
+    "name": "3840x2160-hdr-2-candidate",
+    "frames": 901,
+    "fps": 60.1,
+    "mbps": 154.51,
+    "total": {
+      "avg_us": 16420,
+      "p50_us": 16480,
+      "p95_us": 16897,
+      "p99_us": 17154
+    },
+    "submit": {
+      "avg_us": 62,
+      "p50_us": 59,
+      "p95_us": 86,
+      "p99_us": 119
+    },
+    "enc_wait": {
+      "avg_us": 15961,
+      "p50_us": 16084,
+      "p95_us": 16339,
+      "p99_us": 16486
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 0,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 2,
+        "converter_call_p50_us": 99,
+        "converter_call_p95_us": 148,
+        "converter_call_p99_us": 226
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 100,
+        "converter_call_p95_us": 164,
+        "converter_call_p99_us": 241
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 98,
+        "converter_call_p95_us": 143,
+        "converter_call_p99_us": 265
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9471,
+        "gpu_encode_p95_us": 9546,
+        "gpu_encode_p99_us": 9563,
+        "encode_wall_p50_us": 15997,
+        "encode_wall_p95_us": 16313,
+        "encode_wall_p99_us": 17202
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9467,
+        "gpu_encode_p95_us": 9544,
+        "gpu_encode_p99_us": 9845,
+        "encode_wall_p50_us": 16071,
+        "encode_wall_p95_us": 16340,
+        "encode_wall_p99_us": 18434
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9466,
+        "gpu_encode_p95_us": 9539,
+        "gpu_encode_p99_us": 9668,
+        "encode_wall_p50_us": 16059,
+        "encode_wall_p95_us": 16308,
+        "encode_wall_p99_us": 16392
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 1
+    },
+    "passthrough_events": 1,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 26,
+      "min": 0,
+      "max": 49
+    },
+    "process_cpu_percent_steady": 23.03788580135905,
+    "system_cpu_percent_steady": 14.884979702300406
+  },
+  {
+    "name": "3840x2160-hdr-3-baseline",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 154.39,
+    "total": {
+      "avg_us": 17277,
+      "p50_us": 17205,
+      "p95_us": 18038,
+      "p99_us": 20564
+    },
+    "submit": {
+      "avg_us": 82,
+      "p50_us": 77,
+      "p95_us": 120,
+      "p99_us": 246
+    },
+    "enc_wait": {
+      "avg_us": 11608,
+      "p50_us": 11526,
+      "p95_us": 12022,
+      "p99_us": 14027
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 0,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 2,
+        "converter_call_p50_us": 5146,
+        "converter_call_p95_us": 5490,
+        "converter_call_p99_us": 5632
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 0,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 4,
+        "converter_call_p50_us": 5405,
+        "converter_call_p95_us": 5546,
+        "converter_call_p99_us": 6344
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 0,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 5358,
+        "converter_call_p95_us": 5502,
+        "converter_call_p99_us": 5754
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9477,
+        "gpu_encode_p95_us": 9553,
+        "gpu_encode_p99_us": 9686,
+        "encode_wall_p50_us": 11484,
+        "encode_wall_p95_us": 11882,
+        "encode_wall_p99_us": 14493
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9466,
+        "gpu_encode_p95_us": 9544,
+        "gpu_encode_p99_us": 9836,
+        "encode_wall_p50_us": 11492,
+        "encode_wall_p95_us": 12172,
+        "encode_wall_p99_us": 14598
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9468,
+        "gpu_encode_p95_us": 9536,
+        "gpu_encode_p99_us": 9691,
+        "encode_wall_p50_us": 11502,
+        "encode_wall_p95_us": 11931,
+        "encode_wall_p99_us": 14408
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 0
+    },
+    "passthrough_events": 1,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 20,
+      "min": 0,
+      "max": 40
+    },
+    "process_cpu_percent_steady": 28.24473074963757,
+    "system_cpu_percent_steady": 15.870014771048744
+  },
+  {
+    "name": "3840x2160-hdr-3-candidate",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 154.4,
+    "total": {
+      "avg_us": 17085,
+      "p50_us": 17057,
+      "p95_us": 17645,
+      "p99_us": 18585
+    },
+    "submit": {
+      "avg_us": 65,
+      "p50_us": 60,
+      "p95_us": 99,
+      "p99_us": 125
+    },
+    "enc_wait": {
+      "avg_us": 16581,
+      "p50_us": 16594,
+      "p95_us": 17026,
+      "p99_us": 17927
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 109,
+        "converter_call_p95_us": 158,
+        "converter_call_p99_us": 274
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 100,
+        "converter_call_p95_us": 157,
+        "converter_call_p99_us": 270
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 101,
+        "converter_call_p95_us": 146,
+        "converter_call_p99_us": 231
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9476,
+        "gpu_encode_p95_us": 9548,
+        "gpu_encode_p99_us": 9588,
+        "encode_wall_p50_us": 16535,
+        "encode_wall_p95_us": 16984,
+        "encode_wall_p99_us": 19369
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9468,
+        "gpu_encode_p95_us": 9547,
+        "gpu_encode_p99_us": 9664,
+        "encode_wall_p50_us": 16593,
+        "encode_wall_p95_us": 17043,
+        "encode_wall_p99_us": 20073
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9469,
+        "gpu_encode_p95_us": 9545,
+        "gpu_encode_p99_us": 9689,
+        "encode_wall_p50_us": 16670,
+        "encode_wall_p95_us": 16989,
+        "encode_wall_p99_us": 19044
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 1
+    },
+    "passthrough_events": 1,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 27,
+      "min": 0,
+      "max": 47
+    },
+    "process_cpu_percent_steady": 27.173814519786582,
+    "system_cpu_percent_steady": 15.333216106910498
+  },
+  {
+    "name": "3840x2160-hdr-4-baseline",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 154.37,
+    "total": {
+      "avg_us": 17167,
+      "p50_us": 17095,
+      "p95_us": 17687,
+      "p99_us": 20469
+    },
+    "submit": {
+      "avg_us": 78,
+      "p50_us": 74,
+      "p95_us": 108,
+      "p99_us": 171
+    },
+    "enc_wait": {
+      "avg_us": 11584,
+      "p50_us": 11508,
+      "p95_us": 11888,
+      "p99_us": 14439
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 4,
+        "converter_call_p50_us": 5160,
+        "converter_call_p95_us": 5486,
+        "converter_call_p99_us": 5514
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 4,
+        "converter_call_p50_us": 5156,
+        "converter_call_p95_us": 5497,
+        "converter_call_p99_us": 5583
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 5370,
+        "converter_call_p95_us": 5496,
+        "converter_call_p99_us": 5516
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9478,
+        "gpu_encode_p95_us": 9555,
+        "gpu_encode_p99_us": 9679,
+        "encode_wall_p50_us": 11517,
+        "encode_wall_p95_us": 11975,
+        "encode_wall_p99_us": 14178
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9474,
+        "gpu_encode_p95_us": 9544,
+        "gpu_encode_p99_us": 9880,
+        "encode_wall_p50_us": 11490,
+        "encode_wall_p95_us": 12441,
+        "encode_wall_p99_us": 15073
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9469,
+        "gpu_encode_p95_us": 9541,
+        "gpu_encode_p99_us": 9687,
+        "encode_wall_p50_us": 11512,
+        "encode_wall_p95_us": 12017,
+        "encode_wall_p99_us": 14637
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 0
+    },
+    "passthrough_events": 1,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 28,
+      "min": 0,
+      "max": 47
+    },
+    "process_cpu_percent_steady": 28.67100991514919,
+    "system_cpu_percent_steady": 20.557717250324256
+  },
+  {
+    "name": "3840x2160-hdr-4-candidate",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 154.37,
+    "total": {
+      "avg_us": 17154,
+      "p50_us": 17058,
+      "p95_us": 17742,
+      "p99_us": 19669
+    },
+    "submit": {
+      "avg_us": 68,
+      "p50_us": 65,
+      "p95_us": 96,
+      "p99_us": 115
+    },
+    "enc_wait": {
+      "avg_us": 16587,
+      "p50_us": 16545,
+      "p95_us": 17030,
+      "p99_us": 18169
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 105,
+        "converter_call_p95_us": 151,
+        "converter_call_p99_us": 257
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 11,
+        "converter_call_p50_us": 116,
+        "converter_call_p95_us": 170,
+        "converter_call_p99_us": 271
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 1,
+        "input_slot_p99_us": 2,
+        "converter_call_p50_us": 104,
+        "converter_call_p95_us": 151,
+        "converter_call_p99_us": 211
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9472,
+        "gpu_encode_p95_us": 9544,
+        "gpu_encode_p99_us": 9697,
+        "encode_wall_p50_us": 16603,
+        "encode_wall_p95_us": 16991,
+        "encode_wall_p99_us": 20265
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9477,
+        "gpu_encode_p95_us": 9553,
+        "gpu_encode_p99_us": 9695,
+        "encode_wall_p50_us": 16528,
+        "encode_wall_p95_us": 17160,
+        "encode_wall_p99_us": 19473
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9466,
+        "gpu_encode_p95_us": 9542,
+        "gpu_encode_p99_us": 9837,
+        "encode_wall_p50_us": 16658,
+        "encode_wall_p95_us": 17035,
+        "encode_wall_p99_us": 19947
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 1
+    },
+    "passthrough_events": 1,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 29,
+      "min": 0,
+      "max": 47
+    },
+    "process_cpu_percent_steady": 27.957101586940308,
+    "system_cpu_percent_steady": 18.263331760264276
+  },
+  {
+    "name": "3840x2160-hdr-5-baseline",
+    "frames": 896,
+    "fps": 59.8,
+    "mbps": 153.57,
+    "total": {
+      "avg_us": 18385,
+      "p50_us": 17323,
+      "p95_us": 27172,
+      "p99_us": 35822
+    },
+    "submit": {
+      "avg_us": 98,
+      "p50_us": 87,
+      "p95_us": 177,
+      "p99_us": 234
+    },
+    "enc_wait": {
+      "avg_us": 12154,
+      "p50_us": 11578,
+      "p95_us": 16688,
+      "p99_us": 19344
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 5322,
+        "converter_call_p95_us": 5519,
+        "converter_call_p99_us": 5557
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 3,
+        "input_slot_p99_us": 4,
+        "converter_call_p50_us": 5180,
+        "converter_call_p95_us": 5517,
+        "converter_call_p99_us": 5874
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 3,
+        "input_slot_p99_us": 6,
+        "converter_call_p50_us": 5214,
+        "converter_call_p95_us": 5527,
+        "converter_call_p99_us": 5952
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9469,
+        "gpu_encode_p95_us": 9548,
+        "gpu_encode_p99_us": 9694,
+        "encode_wall_p50_us": 11539,
+        "encode_wall_p95_us": 13246,
+        "encode_wall_p99_us": 15685
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9478,
+        "gpu_encode_p95_us": 9548,
+        "gpu_encode_p99_us": 9776,
+        "encode_wall_p50_us": 11555,
+        "encode_wall_p95_us": 15527,
+        "encode_wall_p99_us": 18506
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9475,
+        "gpu_encode_p95_us": 9547,
+        "gpu_encode_p99_us": 9696,
+        "encode_wall_p50_us": 11538,
+        "encode_wall_p95_us": 14680,
+        "encode_wall_p99_us": 17953
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 3,
+      "source_max": 0
+    },
+    "passthrough_events": 1,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 32,
+      "min": 0,
+      "max": 43
+    },
+    "process_cpu_percent_steady": 29.81402501134779,
+    "system_cpu_percent_steady": 29.607393019012303
+  },
+  {
+    "name": "3840x2160-hdr-5-candidate",
+    "frames": 895,
+    "fps": 59.7,
+    "mbps": 153.5,
+    "total": {
+      "avg_us": 17917,
+      "p50_us": 17213,
+      "p95_us": 24062,
+      "p99_us": 35182
+    },
+    "submit": {
+      "avg_us": 72,
+      "p50_us": 67,
+      "p95_us": 103,
+      "p99_us": 221
+    },
+    "enc_wait": {
+      "avg_us": 16832,
+      "p50_us": 16655,
+      "p95_us": 19023,
+      "p99_us": 26140
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 3,
+        "converter_call_p50_us": 118,
+        "converter_call_p95_us": 167,
+        "converter_call_p99_us": 263
+      },
+      {
+        "samples": 296,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 4,
+        "converter_call_p50_us": 122,
+        "converter_call_p95_us": 201,
+        "converter_call_p99_us": 265
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 2,
+        "input_slot_p99_us": 4,
+        "converter_call_p50_us": 118,
+        "converter_call_p95_us": 173,
+        "converter_call_p99_us": 231
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9471,
+        "gpu_encode_p95_us": 9537,
+        "gpu_encode_p99_us": 9705,
+        "encode_wall_p50_us": 16665,
+        "encode_wall_p95_us": 17069,
+        "encode_wall_p99_us": 18476
+      },
+      {
+        "samples": 296,
+        "gpu_encode_p50_us": 9477,
+        "gpu_encode_p95_us": 9557,
+        "gpu_encode_p99_us": 9858,
+        "encode_wall_p50_us": 16606,
+        "encode_wall_p95_us": 18686,
+        "encode_wall_p99_us": 25564
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9477,
+        "gpu_encode_p95_us": 9553,
+        "gpu_encode_p99_us": 9744,
+        "encode_wall_p50_us": 16579,
+        "encode_wall_p95_us": 17039,
+        "encode_wall_p99_us": 19600
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 3,
+      "source_max": 1
+    },
+    "passthrough_events": 1,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 26,
+      "min": 0,
+      "max": 49
+    },
+    "process_cpu_percent_steady": 28.384943966350928,
+    "system_cpu_percent_steady": 23.850456284957314
+  },
+  {
+    "name": "3840x2160-hdr-composite-1-baseline",
+    "frames": 901,
+    "fps": 60.1,
+    "mbps": 154.47,
+    "total": {
+      "avg_us": 18040,
+      "p50_us": 17986,
+      "p95_us": 18795,
+      "p99_us": 21298
+    },
+    "submit": {
+      "avg_us": 78,
+      "p50_us": 73,
+      "p95_us": 111,
+      "p99_us": 236
+    },
+    "enc_wait": {
+      "avg_us": 11732,
+      "p50_us": 11649,
+      "p95_us": 12177,
+      "p99_us": 14423
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 4964,
+        "converter_call_p95_us": 5270,
+        "converter_call_p99_us": 5361
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 7,
+        "converter_call_p50_us": 4900,
+        "converter_call_p95_us": 5322,
+        "converter_call_p99_us": 5521
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 7,
+        "converter_call_p50_us": 4937,
+        "converter_call_p95_us": 5251,
+        "converter_call_p99_us": 5317
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9460,
+        "gpu_encode_p95_us": 9535,
+        "gpu_encode_p99_us": 9757,
+        "encode_wall_p50_us": 11597,
+        "encode_wall_p95_us": 12095,
+        "encode_wall_p99_us": 14707
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9463,
+        "gpu_encode_p95_us": 9528,
+        "gpu_encode_p99_us": 9573,
+        "encode_wall_p50_us": 11640,
+        "encode_wall_p95_us": 12520,
+        "encode_wall_p99_us": 14567
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9466,
+        "gpu_encode_p95_us": 9526,
+        "gpu_encode_p99_us": 9570,
+        "encode_wall_p50_us": 11630,
+        "encode_wall_p95_us": 12151,
+        "encode_wall_p99_us": 14091
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 0
+    },
+    "passthrough_events": 0,
+    "composite_not_opaque": true,
+    "gpu_busy_percent_whole_run": {
+      "median": 33,
+      "min": 0,
+      "max": 54
+    },
+    "process_cpu_percent_steady": 31.309392511239945,
+    "system_cpu_percent_steady": 18.159350358950217
+  },
+  {
+    "name": "3840x2160-hdr-composite-1-candidate",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 154.37,
+    "total": {
+      "avg_us": 17898,
+      "p50_us": 17797,
+      "p95_us": 18448,
+      "p99_us": 22313
+    },
+    "submit": {
+      "avg_us": 113,
+      "p50_us": 86,
+      "p95_us": 386,
+      "p99_us": 430
+    },
+    "enc_wait": {
+      "avg_us": 16283,
+      "p50_us": 16204,
+      "p95_us": 16901,
+      "p99_us": 18268
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 118,
+        "converter_call_p95_us": 160,
+        "converter_call_p99_us": 190
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 4,
+        "converter_call_p50_us": 113,
+        "converter_call_p95_us": 154,
+        "converter_call_p99_us": 199
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 113,
+        "converter_call_p95_us": 151,
+        "converter_call_p99_us": 189
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9458,
+        "gpu_encode_p95_us": 9532,
+        "gpu_encode_p99_us": 9670,
+        "encode_wall_p50_us": 16142,
+        "encode_wall_p95_us": 16670,
+        "encode_wall_p99_us": 17050
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9464,
+        "gpu_encode_p95_us": 9531,
+        "gpu_encode_p99_us": 9777,
+        "encode_wall_p50_us": 16198,
+        "encode_wall_p95_us": 16943,
+        "encode_wall_p99_us": 19771
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9465,
+        "gpu_encode_p95_us": 9538,
+        "gpu_encode_p99_us": 9566,
+        "encode_wall_p50_us": 16246,
+        "encode_wall_p95_us": 16917,
+        "encode_wall_p99_us": 18213
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 1
+    },
+    "passthrough_events": 0,
+    "composite_not_opaque": true,
+    "gpu_busy_percent_whole_run": {
+      "median": 27,
+      "min": 0,
+      "max": 52
+    },
+    "process_cpu_percent_steady": 31.66906644961809,
+    "system_cpu_percent_steady": 18.752943947244464
+  },
+  {
+    "name": "3840x2160-hdr-composite-2-baseline",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 154.39,
+    "total": {
+      "avg_us": 18048,
+      "p50_us": 18006,
+      "p95_us": 19088,
+      "p99_us": 21871
+    },
+    "submit": {
+      "avg_us": 76,
+      "p50_us": 72,
+      "p95_us": 111,
+      "p99_us": 151
+    },
+    "enc_wait": {
+      "avg_us": 11728,
+      "p50_us": 11638,
+      "p95_us": 12283,
+      "p99_us": 14405
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 4953,
+        "converter_call_p95_us": 5289,
+        "converter_call_p99_us": 5456
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 12,
+        "converter_call_p50_us": 4963,
+        "converter_call_p95_us": 5292,
+        "converter_call_p99_us": 5371
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 3,
+        "input_slot_p99_us": 7,
+        "converter_call_p50_us": 4961,
+        "converter_call_p95_us": 5285,
+        "converter_call_p99_us": 5331
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9468,
+        "gpu_encode_p95_us": 9540,
+        "gpu_encode_p99_us": 9691,
+        "encode_wall_p50_us": 11612,
+        "encode_wall_p95_us": 12069,
+        "encode_wall_p99_us": 14409
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9469,
+        "gpu_encode_p95_us": 9534,
+        "gpu_encode_p99_us": 9665,
+        "encode_wall_p50_us": 11611,
+        "encode_wall_p95_us": 12425,
+        "encode_wall_p99_us": 14413
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9467,
+        "gpu_encode_p95_us": 9530,
+        "gpu_encode_p99_us": 9562,
+        "encode_wall_p50_us": 11629,
+        "encode_wall_p95_us": 12026,
+        "encode_wall_p99_us": 14323
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 0
+    },
+    "passthrough_events": 0,
+    "composite_not_opaque": true,
+    "gpu_busy_percent_whole_run": {
+      "median": 30,
+      "min": 0,
+      "max": 53
+    },
+    "process_cpu_percent_steady": 30.886231212791326,
+    "system_cpu_percent_steady": 17.329177937198637
+  },
+  {
+    "name": "3840x2160-hdr-composite-2-candidate",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 154.36,
+    "total": {
+      "avg_us": 17970,
+      "p50_us": 17893,
+      "p95_us": 18576,
+      "p99_us": 22660
+    },
+    "submit": {
+      "avg_us": 131,
+      "p50_us": 89,
+      "p95_us": 403,
+      "p99_us": 469
+    },
+    "enc_wait": {
+      "avg_us": 16276,
+      "p50_us": 16239,
+      "p95_us": 16882,
+      "p99_us": 17752
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 120,
+        "converter_call_p95_us": 163,
+        "converter_call_p99_us": 188
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 6,
+        "converter_call_p50_us": 119,
+        "converter_call_p95_us": 160,
+        "converter_call_p99_us": 229
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 118,
+        "converter_call_p95_us": 153,
+        "converter_call_p99_us": 191
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9462,
+        "gpu_encode_p95_us": 9533,
+        "gpu_encode_p99_us": 9563,
+        "encode_wall_p50_us": 16172,
+        "encode_wall_p95_us": 16757,
+        "encode_wall_p99_us": 17342
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9465,
+        "gpu_encode_p95_us": 9540,
+        "gpu_encode_p99_us": 9669,
+        "encode_wall_p50_us": 16260,
+        "encode_wall_p95_us": 16916,
+        "encode_wall_p99_us": 19262
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9464,
+        "gpu_encode_p95_us": 9537,
+        "gpu_encode_p99_us": 9567,
+        "encode_wall_p50_us": 16318,
+        "encode_wall_p95_us": 17018,
+        "encode_wall_p99_us": 17921
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 1
+    },
+    "passthrough_events": 0,
+    "composite_not_opaque": true,
+    "gpu_busy_percent_whole_run": {
+      "median": 33,
+      "min": 0,
+      "max": 52
+    },
+    "process_cpu_percent_steady": 31.879773914840747,
+    "system_cpu_percent_steady": 18.406965115595035
+  },
+  {
+    "name": "3840x2160-hdr-composite-3-baseline",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 154.37,
+    "total": {
+      "avg_us": 18060,
+      "p50_us": 18065,
+      "p95_us": 18798,
+      "p99_us": 22386
+    },
+    "submit": {
+      "avg_us": 73,
+      "p50_us": 70,
+      "p95_us": 98,
+      "p99_us": 150
+    },
+    "enc_wait": {
+      "avg_us": 11744,
+      "p50_us": 11650,
+      "p95_us": 12166,
+      "p99_us": 15010
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 7,
+        "converter_call_p50_us": 4917,
+        "converter_call_p95_us": 5276,
+        "converter_call_p99_us": 5372
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 4886,
+        "converter_call_p95_us": 5284,
+        "converter_call_p99_us": 5297
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 3,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 5038,
+        "converter_call_p95_us": 5297,
+        "converter_call_p99_us": 5689
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9465,
+        "gpu_encode_p95_us": 9535,
+        "gpu_encode_p99_us": 9662,
+        "encode_wall_p50_us": 11647,
+        "encode_wall_p95_us": 12449,
+        "encode_wall_p99_us": 14341
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9464,
+        "gpu_encode_p95_us": 9539,
+        "gpu_encode_p99_us": 9665,
+        "encode_wall_p50_us": 11616,
+        "encode_wall_p95_us": 12224,
+        "encode_wall_p99_us": 16030
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9465,
+        "gpu_encode_p95_us": 9539,
+        "gpu_encode_p99_us": 9675,
+        "encode_wall_p50_us": 11597,
+        "encode_wall_p95_us": 12014,
+        "encode_wall_p99_us": 16095
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 0
+    },
+    "passthrough_events": 0,
+    "composite_not_opaque": true,
+    "gpu_busy_percent_whole_run": {
+      "median": 29,
+      "min": 0,
+      "max": 51
+    },
+    "process_cpu_percent_steady": 30.879881099634893,
+    "system_cpu_percent_steady": 15.086003770028276
+  },
+  {
+    "name": "3840x2160-hdr-composite-3-candidate",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 154.36,
+    "total": {
+      "avg_us": 18242,
+      "p50_us": 17790,
+      "p95_us": 21029,
+      "p99_us": 23535
+    },
+    "submit": {
+      "avg_us": 139,
+      "p50_us": 91,
+      "p95_us": 342,
+      "p99_us": 459
+    },
+    "enc_wait": {
+      "avg_us": 16308,
+      "p50_us": 16178,
+      "p95_us": 17474,
+      "p99_us": 19683
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 3,
+        "input_slot_p99_us": 4,
+        "converter_call_p50_us": 116,
+        "converter_call_p95_us": 150,
+        "converter_call_p99_us": 207
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 4,
+        "converter_call_p50_us": 117,
+        "converter_call_p95_us": 159,
+        "converter_call_p99_us": 242
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 6,
+        "converter_call_p50_us": 113,
+        "converter_call_p95_us": 145,
+        "converter_call_p99_us": 205
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9460,
+        "gpu_encode_p95_us": 9532,
+        "gpu_encode_p99_us": 9683,
+        "encode_wall_p50_us": 16136,
+        "encode_wall_p95_us": 16688,
+        "encode_wall_p99_us": 19119
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9462,
+        "gpu_encode_p95_us": 9543,
+        "gpu_encode_p99_us": 9700,
+        "encode_wall_p50_us": 16146,
+        "encode_wall_p95_us": 17658,
+        "encode_wall_p99_us": 19354
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9467,
+        "gpu_encode_p95_us": 9531,
+        "gpu_encode_p99_us": 9562,
+        "encode_wall_p50_us": 16219,
+        "encode_wall_p95_us": 16936,
+        "encode_wall_p99_us": 19720
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 1
+    },
+    "passthrough_events": 0,
+    "composite_not_opaque": true,
+    "gpu_busy_percent_whole_run": {
+      "median": 28,
+      "min": 1,
+      "max": 52
+    },
+    "process_cpu_percent_steady": 31.311607897709017,
+    "system_cpu_percent_steady": 24.23172024019781
+  },
+  {
+    "name": "3840x2160-hdr-composite-4-baseline",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 154.34,
+    "total": {
+      "avg_us": 17665,
+      "p50_us": 17515,
+      "p95_us": 18613,
+      "p99_us": 21414
+    },
+    "submit": {
+      "avg_us": 73,
+      "p50_us": 69,
+      "p95_us": 104,
+      "p99_us": 154
+    },
+    "enc_wait": {
+      "avg_us": 11381,
+      "p50_us": 11438,
+      "p95_us": 11957,
+      "p99_us": 14224
+    },
+    "conversion_windows": [
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 3,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 4921,
+        "converter_call_p95_us": 5236,
+        "converter_call_p99_us": 5369
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 4934,
+        "converter_call_p95_us": 5285,
+        "converter_call_p99_us": 5586
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 4938,
+        "converter_call_p95_us": 5291,
+        "converter_call_p99_us": 5331
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9466,
+        "gpu_encode_p95_us": 9537,
+        "gpu_encode_p99_us": 9627,
+        "encode_wall_p50_us": 11598,
+        "encode_wall_p95_us": 12037,
+        "encode_wall_p99_us": 14524
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9465,
+        "gpu_encode_p95_us": 9536,
+        "gpu_encode_p99_us": 9670,
+        "encode_wall_p50_us": 11395,
+        "encode_wall_p95_us": 12111,
+        "encode_wall_p99_us": 14337
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9463,
+        "gpu_encode_p95_us": 9540,
+        "gpu_encode_p99_us": 9679,
+        "encode_wall_p50_us": 11607,
+        "encode_wall_p95_us": 12030,
+        "encode_wall_p99_us": 14479
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 0
+    },
+    "passthrough_events": 0,
+    "composite_not_opaque": true,
+    "gpu_busy_percent_whole_run": {
+      "median": 27,
+      "min": 0,
+      "max": 51
+    },
+    "process_cpu_percent_steady": 29.954685209073183,
+    "system_cpu_percent_steady": 16.022326674500587
+  },
+  {
+    "name": "3840x2160-hdr-composite-4-candidate",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 154.36,
+    "total": {
+      "avg_us": 17145,
+      "p50_us": 17055,
+      "p95_us": 17828,
+      "p99_us": 21012
+    },
+    "submit": {
+      "avg_us": 126,
+      "p50_us": 83,
+      "p95_us": 333,
+      "p99_us": 386
+    },
+    "enc_wait": {
+      "avg_us": 15539,
+      "p50_us": 15519,
+      "p95_us": 16002,
+      "p99_us": 16923
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 119,
+        "converter_call_p95_us": 158,
+        "converter_call_p99_us": 202
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 117,
+        "converter_call_p95_us": 161,
+        "converter_call_p99_us": 231
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 8,
+        "converter_call_p50_us": 122,
+        "converter_call_p95_us": 155,
+        "converter_call_p99_us": 186
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9465,
+        "gpu_encode_p95_us": 9532,
+        "gpu_encode_p99_us": 9673,
+        "encode_wall_p50_us": 15543,
+        "encode_wall_p95_us": 16092,
+        "encode_wall_p99_us": 17571
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9465,
+        "gpu_encode_p95_us": 9534,
+        "gpu_encode_p99_us": 9671,
+        "encode_wall_p50_us": 15496,
+        "encode_wall_p95_us": 15995,
+        "encode_wall_p99_us": 17840
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9464,
+        "gpu_encode_p95_us": 9537,
+        "gpu_encode_p99_us": 9560,
+        "encode_wall_p50_us": 15509,
+        "encode_wall_p95_us": 16013,
+        "encode_wall_p99_us": 16347
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 1
+    },
+    "passthrough_events": 0,
+    "composite_not_opaque": true,
+    "gpu_busy_percent_whole_run": {
+      "median": 33,
+      "min": 0,
+      "max": 54
+    },
+    "process_cpu_percent_steady": 26.88917756384434,
+    "system_cpu_percent_steady": 14.938737040527805
+  },
+  {
+    "name": "3840x2160-hdr-composite-5-baseline",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 154.35,
+    "total": {
+      "avg_us": 17556,
+      "p50_us": 17508,
+      "p95_us": 18476,
+      "p99_us": 19816
+    },
+    "submit": {
+      "avg_us": 70,
+      "p50_us": 68,
+      "p95_us": 92,
+      "p99_us": 147
+    },
+    "enc_wait": {
+      "avg_us": 11276,
+      "p50_us": 11039,
+      "p95_us": 11972,
+      "p99_us": 12970
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 4896,
+        "converter_call_p95_us": 5274,
+        "converter_call_p99_us": 5328
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 1,
+        "input_slot_p95_us": 3,
+        "input_slot_p99_us": 4,
+        "converter_call_p50_us": 4924,
+        "converter_call_p95_us": 5270,
+        "converter_call_p99_us": 5293
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 3,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 4889,
+        "converter_call_p95_us": 5280,
+        "converter_call_p99_us": 5383
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9466,
+        "gpu_encode_p95_us": 9535,
+        "gpu_encode_p99_us": 9568,
+        "encode_wall_p50_us": 11645,
+        "encode_wall_p95_us": 12282,
+        "encode_wall_p99_us": 14892
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9464,
+        "gpu_encode_p95_us": 9534,
+        "gpu_encode_p99_us": 9560,
+        "encode_wall_p50_us": 10920,
+        "encode_wall_p95_us": 11955,
+        "encode_wall_p99_us": 13085
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9462,
+        "gpu_encode_p95_us": 9533,
+        "gpu_encode_p99_us": 9562,
+        "encode_wall_p50_us": 10877,
+        "encode_wall_p95_us": 11140,
+        "encode_wall_p99_us": 13488
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 0
+    },
+    "passthrough_events": 0,
+    "composite_not_opaque": true,
+    "gpu_busy_percent_whole_run": {
+      "median": 29,
+      "min": 0,
+      "max": 52
+    },
+    "process_cpu_percent_steady": 26.818234125969006,
+    "system_cpu_percent_steady": 15.052433133026982
+  },
+  {
+    "name": "3840x2160-hdr-composite-5-candidate",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 154.38,
+    "total": {
+      "avg_us": 17910,
+      "p50_us": 17826,
+      "p95_us": 18628,
+      "p99_us": 20919
+    },
+    "submit": {
+      "avg_us": 123,
+      "p50_us": 85,
+      "p95_us": 374,
+      "p99_us": 408
+    },
+    "enc_wait": {
+      "avg_us": 16315,
+      "p50_us": 16288,
+      "p95_us": 16838,
+      "p99_us": 18236
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 6,
+        "converter_call_p50_us": 116,
+        "converter_call_p95_us": 159,
+        "converter_call_p99_us": 288
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 13,
+        "converter_call_p50_us": 115,
+        "converter_call_p95_us": 156,
+        "converter_call_p99_us": 227
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 117,
+        "converter_call_p95_us": 154,
+        "converter_call_p99_us": 216
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9466,
+        "gpu_encode_p95_us": 9552,
+        "gpu_encode_p99_us": 9747,
+        "encode_wall_p50_us": 16303,
+        "encode_wall_p95_us": 16895,
+        "encode_wall_p99_us": 19797
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9463,
+        "gpu_encode_p95_us": 9538,
+        "gpu_encode_p99_us": 9670,
+        "encode_wall_p50_us": 16277,
+        "encode_wall_p95_us": 16831,
+        "encode_wall_p99_us": 19800
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9462,
+        "gpu_encode_p95_us": 9532,
+        "gpu_encode_p99_us": 9571,
+        "encode_wall_p50_us": 16221,
+        "encode_wall_p95_us": 16926,
+        "encode_wall_p99_us": 18903
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 3,
+      "source_max": 1
+    },
+    "passthrough_events": 0,
+    "composite_not_opaque": true,
+    "gpu_busy_percent_whole_run": {
+      "median": 27,
+      "min": 0,
+      "max": 52
+    },
+    "process_cpu_percent_steady": 31.38271476367645,
+    "system_cpu_percent_steady": 15.435294117647059
+  },
+  {
+    "name": "3840x2160-sdr-1-baseline",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 158.55,
+    "total": {
+      "avg_us": 18505,
+      "p50_us": 18457,
+      "p95_us": 19041,
+      "p99_us": 22036
+    },
+    "submit": {
+      "avg_us": 73,
+      "p50_us": 71,
+      "p95_us": 101,
+      "p99_us": 176
+    },
+    "enc_wait": {
+      "avg_us": 12010,
+      "p50_us": 11930,
+      "p95_us": 12451,
+      "p99_us": 14438
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 5617,
+        "converter_call_p95_us": 5684,
+        "converter_call_p99_us": 6333
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 6,
+        "converter_call_p50_us": 5602,
+        "converter_call_p95_us": 5678,
+        "converter_call_p99_us": 5976
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 5589,
+        "converter_call_p95_us": 5677,
+        "converter_call_p99_us": 5929
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9754,
+        "gpu_encode_p95_us": 9835,
+        "gpu_encode_p99_us": 9858,
+        "encode_wall_p50_us": 12026,
+        "encode_wall_p95_us": 12444,
+        "encode_wall_p99_us": 14929
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9503,
+        "gpu_encode_p95_us": 9834,
+        "gpu_encode_p99_us": 9849,
+        "encode_wall_p50_us": 11868,
+        "encode_wall_p95_us": 12510,
+        "encode_wall_p99_us": 15107
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9475,
+        "gpu_encode_p95_us": 9791,
+        "gpu_encode_p99_us": 9847,
+        "encode_wall_p50_us": 11791,
+        "encode_wall_p95_us": 12392,
+        "encode_wall_p99_us": 14597
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 0
+    },
+    "passthrough_events": 0,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 30,
+      "min": 0,
+      "max": 52
+    },
+    "process_cpu_percent_steady": 31.02555203392427,
+    "system_cpu_percent_steady": 17.749120750293084
+  },
+  {
+    "name": "3840x2160-sdr-1-candidate",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 158.6,
+    "total": {
+      "avg_us": 18156,
+      "p50_us": 18152,
+      "p95_us": 18845,
+      "p99_us": 21744
+    },
+    "submit": {
+      "avg_us": 106,
+      "p50_us": 102,
+      "p95_us": 140,
+      "p99_us": 401
+    },
+    "enc_wait": {
+      "avg_us": 16887,
+      "p50_us": 16994,
+      "p95_us": 17631,
+      "p99_us": 18025
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 6,
+        "converter_call_p50_us": 124,
+        "converter_call_p95_us": 162,
+        "converter_call_p99_us": 243
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 3,
+        "input_slot_p95_us": 5,
+        "input_slot_p99_us": 6,
+        "converter_call_p50_us": 120,
+        "converter_call_p95_us": 162,
+        "converter_call_p99_us": 242
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 3,
+        "input_slot_p95_us": 5,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 118,
+        "converter_call_p95_us": 151,
+        "converter_call_p99_us": 167
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9492,
+        "gpu_encode_p95_us": 9820,
+        "gpu_encode_p99_us": 9851,
+        "encode_wall_p50_us": 16333,
+        "encode_wall_p95_us": 17086,
+        "encode_wall_p99_us": 18509
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9492,
+        "gpu_encode_p95_us": 9809,
+        "gpu_encode_p99_us": 9862,
+        "encode_wall_p50_us": 17096,
+        "encode_wall_p95_us": 17667,
+        "encode_wall_p99_us": 20078
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9486,
+        "gpu_encode_p95_us": 9548,
+        "gpu_encode_p99_us": 9808,
+        "encode_wall_p50_us": 17294,
+        "encode_wall_p95_us": 17820,
+        "encode_wall_p99_us": 20099
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 3,
+      "source_max": 1
+    },
+    "passthrough_events": 0,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 35,
+      "min": 0,
+      "max": 54
+    },
+    "process_cpu_percent_steady": 31.381391217157535,
+    "system_cpu_percent_steady": 16.36855730760179
+  },
+  {
+    "name": "3840x2160-sdr-2-baseline",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 158.55,
+    "total": {
+      "avg_us": 18635,
+      "p50_us": 18560,
+      "p95_us": 19294,
+      "p99_us": 22330
+    },
+    "submit": {
+      "avg_us": 79,
+      "p50_us": 75,
+      "p95_us": 113,
+      "p99_us": 193
+    },
+    "enc_wait": {
+      "avg_us": 12070,
+      "p50_us": 11953,
+      "p95_us": 12631,
+      "p99_us": 15206
+    },
+    "conversion_windows": [
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 6,
+        "converter_call_p50_us": 5626,
+        "converter_call_p95_us": 5777,
+        "converter_call_p99_us": 5958
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 5617,
+        "converter_call_p95_us": 5865,
+        "converter_call_p99_us": 6084
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 6,
+        "converter_call_p50_us": 5623,
+        "converter_call_p95_us": 5685,
+        "converter_call_p99_us": 5969
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9507,
+        "gpu_encode_p95_us": 9827,
+        "gpu_encode_p99_us": 9839,
+        "encode_wall_p50_us": 11933,
+        "encode_wall_p95_us": 12549,
+        "encode_wall_p99_us": 14992
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9512,
+        "gpu_encode_p95_us": 9829,
+        "gpu_encode_p99_us": 9857,
+        "encode_wall_p50_us": 11927,
+        "encode_wall_p95_us": 12694,
+        "encode_wall_p99_us": 15191
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9482,
+        "gpu_encode_p95_us": 9827,
+        "gpu_encode_p99_us": 9867,
+        "encode_wall_p50_us": 11871,
+        "encode_wall_p95_us": 12564,
+        "encode_wall_p99_us": 15215
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 0
+    },
+    "passthrough_events": 0,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 29,
+      "min": 0,
+      "max": 53
+    },
+    "process_cpu_percent_steady": 31.739568553208834,
+    "system_cpu_percent_steady": 17.784582768977092
+  },
+  {
+    "name": "3840x2160-sdr-2-candidate",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 158.59,
+    "total": {
+      "avg_us": 18505,
+      "p50_us": 18450,
+      "p95_us": 19137,
+      "p99_us": 22661
+    },
+    "submit": {
+      "avg_us": 122,
+      "p50_us": 102,
+      "p95_us": 344,
+      "p99_us": 414
+    },
+    "enc_wait": {
+      "avg_us": 17244,
+      "p50_us": 17217,
+      "p95_us": 17773,
+      "p99_us": 19455
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 3,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 9,
+        "converter_call_p50_us": 122,
+        "converter_call_p95_us": 156,
+        "converter_call_p99_us": 193
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 3,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 4,
+        "converter_call_p50_us": 118,
+        "converter_call_p95_us": 148,
+        "converter_call_p99_us": 257
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 123,
+        "converter_call_p95_us": 155,
+        "converter_call_p99_us": 174
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9489,
+        "gpu_encode_p95_us": 9812,
+        "gpu_encode_p99_us": 9839,
+        "encode_wall_p50_us": 17259,
+        "encode_wall_p95_us": 17782,
+        "encode_wall_p99_us": 19636
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9484,
+        "gpu_encode_p95_us": 9766,
+        "gpu_encode_p99_us": 9840,
+        "encode_wall_p50_us": 17188,
+        "encode_wall_p95_us": 17774,
+        "encode_wall_p99_us": 19950
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9486,
+        "gpu_encode_p95_us": 9559,
+        "gpu_encode_p99_us": 9808,
+        "encode_wall_p50_us": 17256,
+        "encode_wall_p95_us": 17806,
+        "encode_wall_p99_us": 20297
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 1
+    },
+    "passthrough_events": 0,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 35,
+      "min": 0,
+      "max": 54
+    },
+    "process_cpu_percent_steady": 31.881929561578254,
+    "system_cpu_percent_steady": 15.749749395601155
+  },
+  {
+    "name": "3840x2160-sdr-3-baseline",
+    "frames": 900,
+    "fps": 60.1,
+    "mbps": 158.69,
+    "total": {
+      "avg_us": 19210,
+      "p50_us": 18624,
+      "p95_us": 23938,
+      "p99_us": 32273
+    },
+    "submit": {
+      "avg_us": 96,
+      "p50_us": 81,
+      "p95_us": 145,
+      "p99_us": 269
+    },
+    "enc_wait": {
+      "avg_us": 12245,
+      "p50_us": 12041,
+      "p95_us": 13703,
+      "p99_us": 17436
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 5359,
+        "converter_call_p95_us": 5987,
+        "converter_call_p99_us": 6205
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 5365,
+        "converter_call_p95_us": 6104,
+        "converter_call_p99_us": 6362
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 5404,
+        "converter_call_p95_us": 6076,
+        "converter_call_p99_us": 6382
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9520,
+        "gpu_encode_p95_us": 9816,
+        "gpu_encode_p99_us": 9844,
+        "encode_wall_p50_us": 11951,
+        "encode_wall_p95_us": 12377,
+        "encode_wall_p99_us": 15027
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9515,
+        "gpu_encode_p95_us": 9828,
+        "gpu_encode_p99_us": 9868,
+        "encode_wall_p50_us": 12028,
+        "encode_wall_p95_us": 13855,
+        "encode_wall_p99_us": 17271
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9522,
+        "gpu_encode_p95_us": 9824,
+        "gpu_encode_p99_us": 9858,
+        "encode_wall_p50_us": 12074,
+        "encode_wall_p95_us": 15352,
+        "encode_wall_p99_us": 17175
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 3,
+      "source_max": 0
+    },
+    "passthrough_events": 0,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 27,
+      "min": 0,
+      "max": 53
+    },
+    "process_cpu_percent_steady": 33.0945597885874,
+    "system_cpu_percent_steady": 30.764705882352942
+  },
+  {
+    "name": "3840x2160-sdr-3-candidate",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 158.59,
+    "total": {
+      "avg_us": 19525,
+      "p50_us": 18568,
+      "p95_us": 26490,
+      "p99_us": 30860
+    },
+    "submit": {
+      "avg_us": 95,
+      "p50_us": 96,
+      "p95_us": 126,
+      "p99_us": 141
+    },
+    "enc_wait": {
+      "avg_us": 17589,
+      "p50_us": 17338,
+      "p95_us": 20489,
+      "p99_us": 22452
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 3,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 113,
+        "converter_call_p95_us": 154,
+        "converter_call_p99_us": 196
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 115,
+        "converter_call_p95_us": 169,
+        "converter_call_p99_us": 277
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 118,
+        "converter_call_p95_us": 155,
+        "converter_call_p99_us": 176
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9558,
+        "gpu_encode_p95_us": 9831,
+        "gpu_encode_p99_us": 9868,
+        "encode_wall_p50_us": 17331,
+        "encode_wall_p95_us": 17932,
+        "encode_wall_p99_us": 20066
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9509,
+        "gpu_encode_p95_us": 9833,
+        "gpu_encode_p99_us": 9868,
+        "encode_wall_p50_us": 17277,
+        "encode_wall_p95_us": 19735,
+        "encode_wall_p99_us": 21576
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9490,
+        "gpu_encode_p95_us": 9826,
+        "gpu_encode_p99_us": 9862,
+        "encode_wall_p50_us": 17142,
+        "encode_wall_p95_us": 17690,
+        "encode_wall_p99_us": 19022
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 3,
+      "source_max": 1
+    },
+    "passthrough_events": 0,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 29,
+      "min": 0,
+      "max": 55
+    },
+    "process_cpu_percent_steady": 32.449929371884515,
+    "system_cpu_percent_steady": 25.443647902221176
+  },
+  {
+    "name": "3840x2160-sdr-4-baseline",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 158.6,
+    "total": {
+      "avg_us": 18027,
+      "p50_us": 17933,
+      "p95_us": 19278,
+      "p99_us": 21168
+    },
+    "submit": {
+      "avg_us": 81,
+      "p50_us": 77,
+      "p95_us": 122,
+      "p99_us": 197
+    },
+    "enc_wait": {
+      "avg_us": 11359,
+      "p50_us": 11166,
+      "p95_us": 12568,
+      "p99_us": 13772
+    },
+    "conversion_windows": [
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 5555,
+        "converter_call_p95_us": 5846,
+        "converter_call_p99_us": 6393
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 5631,
+        "converter_call_p95_us": 5866,
+        "converter_call_p99_us": 6307
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 5629,
+        "converter_call_p95_us": 5818,
+        "converter_call_p99_us": 6237
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9500,
+        "gpu_encode_p95_us": 9808,
+        "gpu_encode_p99_us": 9841,
+        "encode_wall_p50_us": 11072,
+        "encode_wall_p95_us": 11763,
+        "encode_wall_p99_us": 13001
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9499,
+        "gpu_encode_p95_us": 9826,
+        "gpu_encode_p99_us": 9850,
+        "encode_wall_p50_us": 11253,
+        "encode_wall_p95_us": 12671,
+        "encode_wall_p99_us": 14262
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9497,
+        "gpu_encode_p95_us": 9823,
+        "gpu_encode_p99_us": 9855,
+        "encode_wall_p50_us": 11932,
+        "encode_wall_p95_us": 12598,
+        "encode_wall_p99_us": 14650
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 0
+    },
+    "passthrough_events": 0,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 31,
+      "min": 0,
+      "max": 54
+    },
+    "process_cpu_percent_steady": 30.666868960739553,
+    "system_cpu_percent_steady": 17.092257001647447
+  },
+  {
+    "name": "3840x2160-sdr-4-candidate",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 158.59,
+    "total": {
+      "avg_us": 18510,
+      "p50_us": 18433,
+      "p95_us": 19371,
+      "p99_us": 21938
+    },
+    "submit": {
+      "avg_us": 99,
+      "p50_us": 95,
+      "p95_us": 135,
+      "p99_us": 274
+    },
+    "enc_wait": {
+      "avg_us": 17218,
+      "p50_us": 17221,
+      "p95_us": 17749,
+      "p99_us": 18369
+    },
+    "conversion_windows": [
+      {
+        "samples": 302,
+        "input_slot_p50_us": 3,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 8,
+        "converter_call_p50_us": 119,
+        "converter_call_p95_us": 157,
+        "converter_call_p99_us": 202
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 3,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 8,
+        "converter_call_p50_us": 119,
+        "converter_call_p95_us": 154,
+        "converter_call_p99_us": 206
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 3,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 6,
+        "converter_call_p50_us": 121,
+        "converter_call_p95_us": 165,
+        "converter_call_p99_us": 310
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9476,
+        "gpu_encode_p95_us": 9551,
+        "gpu_encode_p99_us": 9785,
+        "encode_wall_p50_us": 17065,
+        "encode_wall_p95_us": 17530,
+        "encode_wall_p99_us": 18186
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9538,
+        "gpu_encode_p95_us": 9826,
+        "gpu_encode_p99_us": 9864,
+        "encode_wall_p50_us": 17225,
+        "encode_wall_p95_us": 17756,
+        "encode_wall_p99_us": 20436
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9728,
+        "gpu_encode_p95_us": 9833,
+        "gpu_encode_p99_us": 9862,
+        "encode_wall_p50_us": 17286,
+        "encode_wall_p95_us": 17831,
+        "encode_wall_p99_us": 19169
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 1
+    },
+    "passthrough_events": 0,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 34,
+      "min": 0,
+      "max": 54
+    },
+    "process_cpu_percent_steady": 31.664246890393606,
+    "system_cpu_percent_steady": 18.050096791224263
+  },
+  {
+    "name": "3840x2160-sdr-5-baseline",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 158.54,
+    "total": {
+      "avg_us": 18485,
+      "p50_us": 18438,
+      "p95_us": 19061,
+      "p99_us": 22863
+    },
+    "submit": {
+      "avg_us": 77,
+      "p50_us": 74,
+      "p95_us": 104,
+      "p99_us": 195
+    },
+    "enc_wait": {
+      "avg_us": 11973,
+      "p50_us": 11871,
+      "p95_us": 12346,
+      "p99_us": 15393
+    },
+    "conversion_windows": [
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 7,
+        "converter_call_p50_us": 5575,
+        "converter_call_p95_us": 5661,
+        "converter_call_p99_us": 5906
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 10,
+        "converter_call_p50_us": 5574,
+        "converter_call_p95_us": 5693,
+        "converter_call_p99_us": 6186
+      },
+      {
+        "samples": 300,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 7,
+        "converter_call_p50_us": 5612,
+        "converter_call_p95_us": 5698,
+        "converter_call_p99_us": 6295
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9474,
+        "gpu_encode_p95_us": 9762,
+        "gpu_encode_p99_us": 9850,
+        "encode_wall_p50_us": 11807,
+        "encode_wall_p95_us": 12304,
+        "encode_wall_p99_us": 15310
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9517,
+        "gpu_encode_p95_us": 9823,
+        "gpu_encode_p99_us": 9838,
+        "encode_wall_p50_us": 11880,
+        "encode_wall_p95_us": 12563,
+        "encode_wall_p99_us": 16131
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9757,
+        "gpu_encode_p95_us": 9831,
+        "gpu_encode_p99_us": 9866,
+        "encode_wall_p50_us": 12034,
+        "encode_wall_p95_us": 12385,
+        "encode_wall_p99_us": 14919
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 0
+    },
+    "passthrough_events": 0,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 29,
+      "min": 0,
+      "max": 54
+    },
+    "process_cpu_percent_steady": 31.028078843536598,
+    "system_cpu_percent_steady": 15.33565155890847
+  },
+  {
+    "name": "3840x2160-sdr-5-candidate",
+    "frames": 900,
+    "fps": 60.0,
+    "mbps": 158.57,
+    "total": {
+      "avg_us": 18469,
+      "p50_us": 18452,
+      "p95_us": 19012,
+      "p99_us": 21796
+    },
+    "submit": {
+      "avg_us": 97,
+      "p50_us": 97,
+      "p95_us": 132,
+      "p99_us": 161
+    },
+    "enc_wait": {
+      "avg_us": 17274,
+      "p50_us": 17267,
+      "p95_us": 17786,
+      "p99_us": 19933
+    },
+    "conversion_windows": [
+      {
+        "samples": 301,
+        "input_slot_p50_us": 3,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 120,
+        "converter_call_p95_us": 157,
+        "converter_call_p99_us": 217
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 2,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 117,
+        "converter_call_p95_us": 152,
+        "converter_call_p99_us": 187
+      },
+      {
+        "samples": 301,
+        "input_slot_p50_us": 3,
+        "input_slot_p95_us": 4,
+        "input_slot_p99_us": 5,
+        "converter_call_p50_us": 119,
+        "converter_call_p95_us": 149,
+        "converter_call_p99_us": 175
+      }
+    ],
+    "gpu_windows": [
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9486,
+        "gpu_encode_p95_us": 9561,
+        "gpu_encode_p99_us": 9836,
+        "encode_wall_p50_us": 17314,
+        "encode_wall_p95_us": 17864,
+        "encode_wall_p99_us": 20668
+      },
+      {
+        "samples": 300,
+        "gpu_encode_p50_us": 9487,
+        "gpu_encode_p95_us": 9804,
+        "gpu_encode_p99_us": 9832,
+        "encode_wall_p50_us": 17257,
+        "encode_wall_p95_us": 17861,
+        "encode_wall_p99_us": 22368
+      },
+      {
+        "samples": 301,
+        "gpu_encode_p50_us": 9511,
+        "gpu_encode_p95_us": 9830,
+        "gpu_encode_p99_us": 9857,
+        "encode_wall_p50_us": 17349,
+        "encode_wall_p95_us": 17943,
+        "encode_wall_p99_us": 18450
+      }
+    ],
+    "backpressure": {
+      "admission_drops": 0,
+      "in_flight_max": 2,
+      "source_max": 1
+    },
+    "passthrough_events": 0,
+    "composite_not_opaque": false,
+    "gpu_busy_percent_whole_run": {
+      "median": 34,
+      "min": 0,
+      "max": 53
+    },
+    "process_cpu_percent_steady": 31.59509684801012,
+    "system_cpu_percent_steady": 15.821369734055072
+  }
+]

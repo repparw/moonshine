@@ -1,0 +1,5 @@
+warning: Git tree '/tmp/moonshine-async-validation' is dirty
+warning: not writing modified lock file of flake 'git+file:///tmp/moonshine-async-validation':
+• Updated input 'nixpkgs':
+    'github:NixOS/nixpkgs/241313f4e8e508cb9b13278c2b0fa25b9ca27163?narHash=sha256-vlHUuqAcbcH2RKmHbPiuQzbv1pnzzavXnI62RD0bqCU%3D' (2026-07-19)
+  → 'path:/nix/store/87lfqfz7mc5dm4w75qikxhd6lkr9jisr-source?lastModified=0&narHash=sha256-IoNisKcGbUjdd45qCqywGMCYmZ5EnkxezvLII0FWwNA%3D' (1970-01-01)

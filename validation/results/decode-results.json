@@ -1,0 +1,116 @@
+[
+  {
+    "capture": "correctness-sdr1440-2.hevc",
+    "decode_exit_code": 0,
+    "decode_errors": "",
+    "frames": 648,
+    "unique_frames": 648,
+    "longest_identical_run": 1,
+    "streams": [
+      {
+        "profile": "Main",
+        "width": 2560,
+        "height": 1440,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_transfer": "bt709",
+        "color_primaries": "bt709"
+      }
+    ]
+  },
+  {
+    "capture": "correctness-hdr1440.hevc",
+    "decode_exit_code": 0,
+    "decode_errors": "",
+    "frames": 675,
+    "unique_frames": 675,
+    "longest_identical_run": 1,
+    "streams": [
+      {
+        "profile": "Main 10",
+        "width": 2560,
+        "height": 1440,
+        "pix_fmt": "yuv420p10le",
+        "color_space": "bt2020nc",
+        "color_transfer": "smpte2084",
+        "color_primaries": "bt2020"
+      }
+    ]
+  },
+  {
+    "capture": "correctness-hdr4k.hevc",
+    "decode_exit_code": 0,
+    "decode_errors": "",
+    "frames": 675,
+    "unique_frames": 675,
+    "longest_identical_run": 1,
+    "streams": [
+      {
+        "profile": "Main 10",
+        "width": 3840,
+        "height": 2160,
+        "pix_fmt": "yuv420p10le",
+        "color_space": "bt2020nc",
+        "color_transfer": "smpte2084",
+        "color_primaries": "bt2020"
+      }
+    ]
+  },
+  {
+    "capture": "correctness-sdr4k.hevc",
+    "decode_exit_code": 0,
+    "decode_errors": "",
+    "frames": 678,
+    "unique_frames": 678,
+    "longest_identical_run": 1,
+    "streams": [
+      {
+        "profile": "Main",
+        "width": 3840,
+        "height": 2160,
+        "pix_fmt": "yuv420p",
+        "color_space": "bt709",
+        "color_transfer": "bt709",
+        "color_primaries": "bt709"
+      }
+    ]
+  },
+  {
+    "capture": "correctness-transitions.hevc",
+    "decode_exit_code": 0,
+    "decode_errors": "",
+    "frames": 1025,
+    "unique_frames": 1023,
+    "longest_identical_run": 1,
+    "streams": [
+      {
+        "profile": "Main 10",
+        "width": 3840,
+        "height": 2160,
+        "pix_fmt": "yuv420p10le",
+        "color_space": "bt2020nc",
+        "color_transfer": "smpte2084",
+        "color_primaries": "bt2020"
+      }
+    ]
+  },
+  {
+    "capture": "correctness-windows.hevc",
+    "decode_exit_code": 0,
+    "decode_errors": "",
+    "frames": 756,
+    "unique_frames": 756,
+    "longest_identical_run": 1,
+    "streams": [
+      {
+        "profile": "Main 10",
+        "width": 3840,
+        "height": 2160,
+        "pix_fmt": "yuv420p10le",
+        "color_space": "bt709",
+        "color_transfer": "bt709",
+        "color_primaries": "bt709"
+      }
+    ]
+  }
+]
