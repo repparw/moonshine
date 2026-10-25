@@ -2,6 +2,7 @@
 
 import importlib.util
 import json
+import socket
 from pathlib import Path
 import tempfile
 import unittest
@@ -78,6 +79,14 @@ class VerifyVideoTests(unittest.TestCase):
             self.assertEqual(result, 2)
             self.assertFalse((Path(folder) / "report.json").exists())
             run.assert_not_called()
+
+
+    def test_occupied_udp_port_is_rejected(self):
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as held:
+            held.bind(("127.0.0.1", 0))
+            with patch.object(verify_video, "VIDEO_PORT", held.getsockname()[1]):
+                with self.assertRaises(OSError):
+                    verify_video.check_port_free()
 
 
 if __name__ == "__main__":
