@@ -33,8 +33,8 @@ use dmabuf::{CachedImport, DmaBufImporter, DmaBufPlane};
 
 use pixelforge::{
 	Codec, ColorConverter, ColorConverterConfig, ColorDescription, ColorRange, ColorSpec, EncodeConfig, EncodeFuture,
-	Encoder, EncoderTuningMode, InputFormat, OutputFormat, PixelForgeError, PixelFormat, RateControlMode, VideoContext,
-	VideoContextBuilder,
+	Encoder, EncoderTuningMode, InputFormat, OutputFormat, PixelForgeError, PixelFormat, RateControlMode,
+	TimelinePoint, VideoContext, VideoContextBuilder,
 };
 
 /// Maximum number of frames in flight (submitted to the encoder but not yet
@@ -235,7 +235,7 @@ enum ConsumerMessage {
 	/// A submitted frame's context together with the [`EncodeFuture`] that
 	/// resolves with its encoded packet. Awaiting the future yields the packet
 	/// for exactly this frame, so context and packet are paired by construction.
-	Frame(FrameContext, EncodeFuture, Option<ferriscope::Frame>),
+	Frame(FrameContext, EncodeFuture, InFlightGuard),
 	/// Reset the RTP/frame counters (client reconnect/resume), so subsequent
 	/// packets restart from frame 1. Ordered with `Frame` messages so it takes
 	/// effect before any frame submitted after the reset. Carries the reset's
@@ -243,10 +243,17 @@ enum ConsumerMessage {
 	ResetCounters(u32),
 }
 
-/// Decrements the in-flight frame counter when dropped, on every exit path of a
-/// consumer-loop iteration (success or early `continue`). This is what tells the
+/// Decrements the in-flight frame counter when a queued or consumed frame is
+/// dropped, including failed delivery and cancellation. This is what tells the
 /// encoding thread a slot has freed up so it can stop dropping new captures.
 struct InFlightGuard(Arc<AtomicUsize>);
+
+impl InFlightGuard {
+	fn new(in_flight: &Arc<AtomicUsize>) -> Self {
+		in_flight.fetch_add(1, Ordering::Relaxed);
+		Self(in_flight.clone())
+	}
+}
 
 impl Drop for InFlightGuard {
 	fn drop(&mut self) {
@@ -272,7 +279,6 @@ async fn run_packet_consumer(
 	mut ctx_rx: mpsc::Receiver<ConsumerMessage>,
 	packet_tx: mpsc::Sender<(u32, ShardBatch)>,
 	stats_tx: broadcast::Sender<FrameStats>,
-	in_flight: Arc<AtomicUsize>,
 	idr_tx: broadcast::Sender<()>,
 	mut packetizer: Packetizer,
 	ctx: VideoStreamContext,
@@ -290,19 +296,18 @@ async fn run_packet_consumer(
 	// Driven by the message channel: one `Frame` per submitted frame. When the
 	// encoding thread drops its sender, this loop ends after the last frame.
 	while let Some(msg) = ctx_rx.recv().await {
-		let (frame_context, future, source_frame) = match msg {
+		let (frame_context, future, _in_flight) = match msg {
 			ConsumerMessage::ResetCounters(epoch) => {
 				frame_number = 0;
 				sequence_number = 0;
 				reset_epoch = epoch;
 				continue;
 			},
-			ConsumerMessage::Frame(frame_context, future, source_frame) => (frame_context, future, source_frame),
+			ConsumerMessage::Frame(frame_context, future, in_flight) => (frame_context, future, in_flight),
 		};
 
 		// This frame is in flight until the iteration ends; release its slot on
 		// every exit path (including the early `continue`s below).
-		let _in_flight = InFlightGuard(in_flight.clone());
 
 		let t_wait_started = std::time::Instant::now();
 		let consumer_queue_dur = t_wait_started.saturating_duration_since(frame_context.submitted_at);
@@ -325,8 +330,6 @@ async fn run_packet_consumer(
 				continue;
 			},
 		};
-		// Encode completion orders the conversion; only now may the compositor reuse the DMA-BUF.
-		drop(source_frame);
 		let t_packet_ready = std::time::Instant::now();
 		let encode_wait_dur = t_packet_ready.saturating_duration_since(frame_context.submitted_at);
 
@@ -514,6 +517,39 @@ struct VideoPipelineInner {
 	keys_rx: SessionKeysReceiver,
 }
 
+struct PendingConversion {
+	frame: Option<ferriscope::Frame>,
+	_import: Arc<CachedImport>,
+	completion: TimelinePoint,
+}
+
+struct AsyncColorConverter {
+	// Fields drop in declaration order: wait for conversion before releasing its source.
+	converter: ColorConverter,
+	source: Option<PendingConversion>,
+	failed_source: Option<(ferriscope::Frame, Arc<CachedImport>)>,
+}
+
+impl AsyncColorConverter {
+	fn release_completed(&mut self, context: &VideoContext) -> Result<(), String> {
+		if let Some(source) = &mut self.source
+			&& source.frame.is_some()
+		{
+			// SAFETY: pixelforge keeps conversion timeline points valid for the context's lifetime.
+			let completed = unsafe {
+				context
+					.device()
+					.get_semaphore_counter_value(source.completion.semaphore)
+			}
+			.map_err(|e| format!("Failed to query conversion completion: {e}"))?;
+			if completed >= source.completion.value {
+				source.frame = None;
+			}
+		}
+		Ok(())
+	}
+}
+
 impl VideoPipelineInner {
 	#[allow(clippy::too_many_arguments)]
 	fn run(
@@ -689,7 +725,6 @@ impl VideoPipelineInner {
 		let consumer = {
 			let ctx = self.context.clone();
 			let config = self.config.clone();
-			let in_flight = in_flight.clone();
 			// The packetize/send half is pure async work (await the encode future,
 			// packetize, send) with no blocking GPU calls, so it runs as a task on
 			// moonshine's main runtime — a green thread multiplexed with the rest of
@@ -700,7 +735,6 @@ impl VideoPipelineInner {
 				frame_ctx_rx,
 				packet_tx,
 				stats_tx,
-				in_flight,
 				idr_tx.clone(),
 				packetizer,
 				ctx,
@@ -725,10 +759,8 @@ impl VideoPipelineInner {
 		};
 
 		// Converter per input format, plus the source import whose view it caches.
-		let mut color_converters: std::collections::HashMap<u32, (ColorConverter, Option<Arc<CachedImport>>)> =
+		let mut color_converters: std::collections::HashMap<u32, AsyncColorConverter> =
 			std::collections::HashMap::new();
-		// Failed submissions must not return DMA-BUFs while conversion may still be running.
-		let mut deferred_frames: Vec<ferriscope::Frame> = Vec::new();
 
 		// Encoding loop - receives frames from compositor.
 		let frame_interval = std::time::Duration::from_secs_f64(1.0 / ctx.fps as f64);
@@ -770,6 +802,9 @@ impl VideoPipelineInner {
 		});
 
 		while !stop_session_manager.is_shutdown_triggered() {
+			for converter in color_converters.values_mut() {
+				converter.release_completed(&context)?;
+			}
 			let mut pending_idr = false;
 
 			// Drain any pending stream-reset requests (client reconnect/resume).
@@ -870,11 +905,16 @@ impl VideoPipelineInner {
 									hdr_metadata: last_hdr_state.metadata,
 								};
 								// Count this frame in flight; the consumer decrements when done.
-								in_flight.fetch_add(1, Ordering::Relaxed);
+								let in_flight = InFlightGuard::new(&in_flight);
 								submitted_count += 1;
-								let _ = frame_ctx_tx.blocking_send(ConsumerMessage::Frame(frame_context, future, None));
+								if frame_ctx_tx
+									.blocking_send(ConsumerMessage::Frame(frame_context, future, in_flight))
+									.is_err()
+								{
+									break;
+								}
 							},
-							Err(e) => tracing::warn!("Failed to re-encode frame for IDR request: {e}"),
+							Err(e) => return Err(format!("Failed to re-encode frame for IDR request: {e}")),
 						}
 					}
 					if !pending_idr && last_frame_time.elapsed() > std::time::Duration::from_secs(5) {
@@ -995,7 +1035,11 @@ impl VideoPipelineInner {
 
 				// Get (or build) a converter for this input format. Cached per
 				// format so switching render paths doesn't rebuild one each frame.
-				let (converter, cached_source) = match color_converters.entry(fourcc) {
+				let AsyncColorConverter {
+					converter,
+					source,
+					failed_source,
+				} = match color_converters.entry(fourcc) {
 					std::collections::hash_map::Entry::Occupied(e) => e.into_mut(),
 					std::collections::hash_map::Entry::Vacant(e) => {
 						// Start from the session's own colour space; an HDR session
@@ -1016,7 +1060,11 @@ impl VideoPipelineInner {
 						match ColorConverter::new(context.clone(), config) {
 							Ok(conv) => {
 								tracing::debug!("Created color converter for input format {frame_input_format:?}");
-								e.insert((conv, None))
+								e.insert(AsyncColorConverter {
+									converter: conv,
+									source: None,
+									failed_source: None,
+								})
 							},
 							Err(e) => {
 								tracing::warn!("Failed to create color converter: {e}");
@@ -1059,23 +1107,22 @@ impl VideoPipelineInner {
 					}
 				}
 
-				// Retain the source image; the converter caches a view of it.
-				*cached_source = Some(Arc::clone(&source_import));
-
-				// Convert to YUV.
+				let frame_hdr_metadata = hdr_metadata(&frame.info.colour);
 				let conversion = match converter.convert_async(source_image, src_layout, encoder.input_image(), &[]) {
 					Ok(point) => point,
 					Err(e) => {
-						if is_device_lost(&e) {
-							return Err(format!("GPU color conversion failed: {e}"));
-					}
-						tracing::warn!("GPU color conversion failed: {e}");
-						continue;
+						// A failed recording can still retain a view of the new import.
+						*failed_source = Some((frame, source_import));
+						return Err(format!("GPU color conversion failed: {e}"));
 					},
 				};
-
-				// Keep the source borrowed until the GPU has completed conversion.
-				let frame_hdr_metadata = hdr_metadata(&frame.info.colour);
+				// convert_async waited for the previous conversion before reusing its commands.
+				// Keep this source and its import with the converter on every encode/error path.
+				*source = Some(PendingConversion {
+					frame: Some(frame),
+					_import: source_import,
+					completion: conversion,
+				});
 
 				// Forward HDR mode state changes to the control stream.
 				// In HDR sessions, `enabled` reflects whether the current
@@ -1131,14 +1178,13 @@ impl VideoPipelineInner {
 							hdr_metadata: last_hdr_state.metadata,
 						};
 						// Count this frame in flight; the consumer decrements when done.
-						in_flight.fetch_add(1, Ordering::Relaxed);
+						has_encoded = true;
+						let in_flight = InFlightGuard::new(&in_flight);
 						submitted_count += 1;
-						if let Err(err) = frame_ctx_tx
-							.blocking_send(ConsumerMessage::Frame(frame_context, future, Some(frame)))
+						if frame_ctx_tx
+							.blocking_send(ConsumerMessage::Frame(frame_context, future, in_flight))
+							.is_err()
 						{
-							if let ConsumerMessage::Frame(_, _, Some(frame)) = err.0 {
-								deferred_frames.push(frame);
-							}
 							tracing::debug!("Packet consumer gone; stopping encoding loop.");
 							break;
 						}
@@ -1147,16 +1193,13 @@ impl VideoPipelineInner {
 						if is_device_lost(&e) {
 							return Err(format!("Failed to encode frame: {e}"));
 						}
-						tracing::warn!("Failed to encode frame: {e}");
-						deferred_frames.push(frame);
+						return Err(format!("Failed to encode frame: {e}"));
 					},
 				}
 
 				if !pending_idr {
 					last_frame_time = std::time::Instant::now();
 				}
-
-				has_encoded = true;
 			}
 		}
 
@@ -1165,10 +1208,7 @@ impl VideoPipelineInner {
 		if let Err(e) = encoder.flush() {
 			tracing::warn!("Failed to flush encoder: {e}");
 		}
-		// Dropping converters waits for any outstanding conversion commands.
-		// Only then may failed-submission frames be returned to the compositor.
 		drop(color_converters);
-		drop(deferred_frames);
 		drop(frame_ctx_tx);
 		// Wait for the consumer task to drain and send the remaining packets. This
 		// runs on a plain OS thread outside the runtime, so block on the task handle.
@@ -1182,9 +1222,42 @@ impl VideoPipelineInner {
 
 #[cfg(test)]
 mod tests {
-	use super::{drm_fourcc_to_input, is_device_lost};
+	use super::{InFlightGuard, drm_fourcc_to_input, is_device_lost};
 	use ash::vk;
 	use pixelforge::{InputFormat, PixelForgeError};
+	use std::sync::{
+		Arc,
+		atomic::{AtomicUsize, Ordering},
+	};
+
+	#[test]
+	fn failed_delivery_returns_in_flight_slot() {
+		let count = Arc::new(AtomicUsize::new(0));
+		let (tx, rx) = tokio::sync::mpsc::channel(1);
+		drop(rx);
+		let rejected = tx.try_send(InFlightGuard::new(&count)).expect_err("receiver is closed");
+		assert_eq!(count.load(Ordering::Relaxed), 1);
+		drop(rejected);
+		assert_eq!(count.load(Ordering::Relaxed), 0);
+	}
+
+	#[test]
+	fn dropping_consumer_queue_returns_all_in_flight_slots() {
+		let count = Arc::new(AtomicUsize::new(0));
+		let (tx, rx) = tokio::sync::mpsc::channel(3);
+		for _ in 0..3 {
+			assert!(tx.try_send(InFlightGuard::new(&count)).is_ok());
+		}
+		assert_eq!(count.load(Ordering::Relaxed), 3);
+		drop(rx);
+		assert_eq!(count.load(Ordering::Relaxed), 0);
+	}
+
+	#[test]
+	fn captured_frames_are_send() {
+		fn assert_send<T: Send>() {}
+		assert_send::<ferriscope::Frame>();
+	}
 
 	// DRM fourccs — kept in the test module to document the byte ordering
 	// explicitly and guard against accidental typos in the production match.
