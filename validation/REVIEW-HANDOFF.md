@@ -96,12 +96,12 @@ Do not waive a concrete ownership defect because performance is not the goal.
 
 ## Existing local artifacts
 
-- Source/validation branch: `/tmp/moonshine-async-validation`.
-- Disposable candidate: `/tmp/moonshine-async-runtime` at b1459f2 plus local patches.
-- Disposable baseline: `/tmp/moonshine-async-baseline` at ae27c5a (upstream + tooling).
-- Dependency clones: `/tmp/moonshine-4k60-investigation/{pixelforge,ferriscope,client}`.
+- Source/validation branch: `/home/repparw/Projects/moonshine-async-validation`.
+- Disposable candidate: `/home/repparw/Projects/moonshine-async-runtime` at b1459f2 plus local patches.
+- Disposable baseline: `/home/repparw/Projects/moonshine-async-baseline` at ae27c5a (upstream + tooling).
+- Dependency clones: `/home/repparw/Projects/moonshine-investigation/{pixelforge,ferriscope,client}`.
 - Raw captures, workload and distinct binaries:
-  `/tmp/moonshine-4k60-investigation/async-validation/`.
+  `/home/repparw/Projects/moonshine-investigation/async-validation/`.
 - Full candidate executable: that directory's `bin/candidate-server`.
 - Nix repo has earlier uncommitted research docs; do not commit them with this PR.
 

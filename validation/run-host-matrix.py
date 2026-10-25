@@ -125,7 +125,7 @@ def main():
         if "Isolated Moonshine async validation benchmark" not in help_text:
             parser.error(f"refusing a binary without the isolation marker: {binary}")
     args.output.mkdir(parents=True)
-    with Path("/tmp/moonshine-async-validation.lock").open("w") as lock:
+    with Path("/home/repparw/Projects/moonshine-async-validation.lock").open("w") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         profiles = [
             ("2560x1440", True, args.hdr_workload, ""),
