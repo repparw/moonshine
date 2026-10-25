@@ -263,7 +263,7 @@ impl StatsAccumulator {
 		self.total_us += total as u128;
 		self.channel_wait_us += stats.channel_wait.as_micros();
 		self.import_us += stats.import.as_micros();
-		self.convert_us += stats.convert.as_micros();
+		self.convert_us += stats.convert_submit().as_micros();
 		self.submit_us += submit as u128;
 		self.consumer_queue_us += stats.consumer_queue.as_micros();
 		self.encode_wait_us += encode_wait as u128;
@@ -358,7 +358,7 @@ impl StatsAccumulator {
 			summary.encode_wait.p99_us
 		);
 		tracing::info!(
-			"  avg breakdown: ch_wait={avg_channel_wait:.0}us  import={avg_import:.0}us  convert={avg_convert:.0}us  submit={avg_submit:.0}us  enc_wait={avg_encode_wait:.0}us  pkt={avg_packetize:.0}us  send={avg_send:.0}us",
+			"  avg breakdown: ch_wait={avg_channel_wait:.0}us  import={avg_import:.0}us  convert_submit={avg_convert:.0}us  submit={avg_submit:.0}us  enc_wait={avg_encode_wait:.0}us  pkt={avg_packetize:.0}us  send={avg_send:.0}us",
 			avg_channel_wait = summary.avg_channel_wait_us,
 			avg_import = summary.avg_import_us,
 			avg_convert = summary.avg_convert_us,
@@ -658,11 +658,11 @@ async fn run_benchmark(
 						if Instant::now() >= warmup_deadline {
 							if args.verbose {
 								tracing::info!(
-									"frame: total={}us ch_wait={}us import={}us convert={}us submit={}us queue={}us enc_wait={}us pkt={}us send={}us {} {}b",
+									"frame: total={}us ch_wait={}us import={}us convert_submit={}us submit={}us queue={}us enc_wait={}us pkt={}us send={}us {} {}b",
 									stats.total.as_micros(),
 									stats.channel_wait.as_micros(),
 									stats.import.as_micros(),
-									stats.convert.as_micros(),
+									stats.convert_submit().as_micros(),
 									stats.submit.as_micros(),
 									stats.consumer_queue.as_micros(),
 									stats.encode_wait.as_micros(),
@@ -815,7 +815,7 @@ fn print_matrix_summary(reports: &[MatrixReport]) {
 		"codec",
 		"ch_wait",
 		"import",
-		"convert",
+		"convert_submit",
 		"submit",
 		"enc_wait",
 		"pkt",

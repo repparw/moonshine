@@ -99,24 +99,37 @@ pub struct FrameStats {
 	pub channel_wait: std::time::Duration,
 	/// Time spent importing the DMA-BUF into Vulkan.
 	pub import: std::time::Duration,
-	/// Time spent on GPU color conversion.
+	/// CPU time preparing and submitting color conversion, including waits for
+	/// the encoder input slot and the converter's previous submission. This does
+	/// not wait for the current GPU conversion to finish; its remaining GPU wait
+	/// is included in `encode_wait`. Kept under the original name for compatibility.
+	/// Prefer [`Self::convert_submit`] when labelling this measurement.
 	pub convert: std::time::Duration,
 	/// Time spent submitting the frame to the asynchronous encoder.
 	pub submit: std::time::Duration,
 	/// Time between submit completion and the packet consumer awaiting the encode future.
 	pub consumer_queue: std::time::Duration,
-	/// Time from submit completion until the asynchronous encode/readback future has resolved.
+	/// Time from encoder submit completion until encode/readback has resolved,
+	/// including any remaining GPU conversion dependency and consumer scheduling.
 	pub encode_wait: std::time::Duration,
 	/// Time spent packetizing the encoded data.
 	pub packetize: std::time::Duration,
 	/// Time spent sending the packets over the channel.
 	pub send: std::time::Duration,
-	/// Total end-to-end latency for this frame.
+	/// Time from capture until packet-channel enqueue, including packetization.
+	/// This does not include the network send or client decode/display.
 	pub total: std::time::Duration,
 	/// Number of bytes encoded for this frame.
 	pub encoded_bytes: usize,
 	/// Whether this frame is a key (IDR) frame.
 	pub is_key_frame: bool,
+}
+
+impl FrameStats {
+	/// CPU conversion preparation/submission time; see [`Self::convert`].
+	pub fn convert_submit(&self) -> std::time::Duration {
+		self.convert
+	}
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]

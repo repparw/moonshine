@@ -95,21 +95,6 @@ fn drm_fourcc_to_input(fourcc: u32) -> (InputFormat, vk::Format) {
 	}
 }
 
-/// Whether a pixelforge error indicates Vulkan device loss.
-///
-/// Device loss is unrecoverable on the existing device: every subsequent GPU
-/// operation fails the same way, so the encoding loop must exit (shutting the
-/// session down) instead of retrying forever and freezing the stream.
-fn is_device_lost(e: &PixelForgeError) -> bool {
-	match e {
-		PixelForgeError::Vulkan(result) => *result == vk::Result::ERROR_DEVICE_LOST,
-		// Other variants (e.g. CommandBuffer) stringify the underlying
-		// vk::Result, whose ash display text is "The logical device has been
-		// lost. See <...>".
-		_ => e.to_string().contains("device has been lost"),
-	}
-}
-
 pub(crate) struct VideoPipeline {}
 
 /// A single frame's latency breakdown for periodic summary reporting.
@@ -184,6 +169,11 @@ fn log_latency_summary(samples: &[LatencySample], elapsed: std::time::Duration) 
 		channel_p95_us = p95(&channel),
 		channel_p99_us = p99(&channel),
 		import_p50_us = p50(&imports),
+		conversion_timing = "submission",
+		convert_submit_p50_us = p50(&converts),
+		convert_submit_p95_us = p95(&converts),
+		convert_submit_p99_us = p99(&converts),
+		// Legacy aliases: these now measure CPU preparation/submission too.
 		convert_p50_us = p50(&converts),
 		convert_p95_us = p95(&converts),
 		convert_p99_us = p99(&converts),
@@ -407,6 +397,8 @@ async fn run_packet_consumer(
 				total_us = total.as_micros() as u64,
 				channel_us = frame_context.channel_wait.as_micros() as u64,
 				import_us = frame_context.import.as_micros() as u64,
+				conversion_timing = "submission",
+				convert_submit_us = frame_context.convert.as_micros() as u64,
 				convert_us = frame_context.convert.as_micros() as u64,
 				submit_us = frame_context.submit.as_micros() as u64,
 				consumer_queue_us = consumer_queue_dur.as_micros() as u64,
@@ -1190,9 +1182,6 @@ impl VideoPipelineInner {
 						}
 					},
 					Err(e) => {
-						if is_device_lost(&e) {
-							return Err(format!("Failed to encode frame: {e}"));
-						}
 						return Err(format!("Failed to encode frame: {e}"));
 					},
 				}
@@ -1222,9 +1211,9 @@ impl VideoPipelineInner {
 
 #[cfg(test)]
 mod tests {
-	use super::{InFlightGuard, drm_fourcc_to_input, is_device_lost};
+	use super::{InFlightGuard, drm_fourcc_to_input};
 	use ash::vk;
-	use pixelforge::{InputFormat, PixelForgeError};
+	use pixelforge::InputFormat;
 	use std::sync::{
 		Arc,
 		atomic::{AtomicUsize, Ordering},
@@ -1322,25 +1311,5 @@ mod tests {
 		let (fmt, vk) = drm_fourcc_to_input(0xDEADBEEF);
 		assert_eq!(fmt, InputFormat::BGRx);
 		assert_eq!(vk, vk::Format::B8G8R8A8_UNORM);
-	}
-
-	#[test]
-	fn device_lost_is_detected_in_both_error_shapes() {
-		// Structured variant.
-		assert!(is_device_lost(&PixelForgeError::Vulkan(vk::Result::ERROR_DEVICE_LOST)));
-		// String variant: pixelforge wraps the vk::Result display text, e.g.
-		// CommandBuffer("The logical device has been lost. See <...>") —
-		// the shape observed when a stale DMA-BUF import faults the GPU.
-		assert!(is_device_lost(&PixelForgeError::CommandBuffer(
-			vk::Result::ERROR_DEVICE_LOST.to_string()
-		)));
-	}
-
-	#[test]
-	fn recoverable_errors_are_not_device_lost() {
-		assert!(!is_device_lost(&PixelForgeError::Vulkan(vk::Result::TIMEOUT)));
-		assert!(!is_device_lost(&PixelForgeError::CommandBuffer(
-			"submit failed".to_string()
-		)));
 	}
 }
