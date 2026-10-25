@@ -1,0 +1,10 @@
+[
+  {
+    "name": "/tmp/moonshine-tv-validation/baseline-server",
+    "sha256": "4d39deffbc07ebf670d91fb4a3d845f1931362b8f310a19849bb329da282be0e"
+  },
+  {
+    "name": "/tmp/moonshine-4k60-investigation/async-validation/bin/candidate-server",
+    "sha256": "0029f099a290c0e0e601b8a094ca4f613557bf8110467f2cba409d09c0245383"
+  }
+]

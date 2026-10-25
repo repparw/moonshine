@@ -5,8 +5,8 @@ passed after fixing ownership and accounting. The controlled host workload does
 not reproduce the deployed 39–42 FPS 4K HDR limit, so it cannot establish that
 async conversion fixes that limit. No extra converter slots or buffering are
 justified by these results. Production was unchanged. The user subsequently
-authorized TV testing: the LG C3 was muted and verified muted, but no TV streaming
-session was launched before preparing the review handoff.
+authorized TV testing. The later [TV continuation](tv/REPORT.md) records thirteen
+controlled cases, restoration and remaining limits. The LG C3 remains muted.
 
 ## Revisions and build
 
@@ -25,7 +25,8 @@ dependencies were unchanged. `cargo fmt --all -- --check`, workspace/all-targets
 `cargo check`, workspace tests, and workspace/all-targets Clippy with
 `-D warnings` passed. Tests: 139 passed, zero failed, one ignored manual Bottles
 integration test. Nix formatting passed. Release benchmark binaries built.
-The candidate standalone server also built in release mode; it was not launched.
+Both standalone servers built in release mode and were subsequently run as
+private instances for the TV continuation; production was not replaced.
 
 ## Matched host performance
 
@@ -118,9 +119,10 @@ PATH also failed before encoding and was repeated with the correct environment.
 
 ## Measurement limits and next work
 
-The host-only receiver is not the LG C3. TV decode/drop statistics, display
-latency, disconnect/reconnect via Moonlight, visual HDR transitions, and real
-network queue age were not measured. Exact capture-to-bitstream-ready
+The host-only receiver is not the LG C3. The subsequent TV continuation adds
+sampled decode/drop overlays and real Moonlight resume checks. Physical display
+latency, visual HDR transitions and real network queue age remain unmeasured.
+Exact capture-to-bitstream-ready
 percentiles, isolated GPU conversion timestamps, actual total GBM occupancy,
 compositor render ticks and capture-pool skip counts are still missing. The
 reported total is capture-to-packet-channel enqueue; enc_wait is not hardware
