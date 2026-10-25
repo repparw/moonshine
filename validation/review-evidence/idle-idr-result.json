@@ -1,0 +1,14 @@
+{
+  "expected_luma": [
+    16,
+    235,
+    235
+  ],
+  "decoded_mean_luma": [
+    15.99875,
+    235.0,
+    15.99875
+  ],
+  "stale_idle_idr_reproduced": true,
+  "pixelforge": "4f3ff5e963a733e4036fd0bcb62df33daeb4ca94"
+}

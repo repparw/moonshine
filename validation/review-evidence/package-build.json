@@ -1,0 +1,6 @@
+{
+  "nixpkgs": "02c087f3fe673c9e317f206a627cb6b910336dbe",
+  "first_full_package": "/nix/store/8vkqkn5cny9whvhf8c10jygb77a4yvkn-moonshine-0.16.1",
+  "ash_hash": "sha256-moPoBR+XXfM9vXZQWxmM7QpLg2dJEwloy6FEY//kEF8=",
+  "source_note": "Final exact formatted source build recorded separately; initial build differed by one blank line only."
+}
