@@ -2,5 +2,8 @@
   "nixpkgs": "02c087f3fe673c9e317f206a627cb6b910336dbe",
   "first_full_package": "/nix/store/8vkqkn5cny9whvhf8c10jygb77a4yvkn-moonshine-0.16.1",
   "ash_hash": "sha256-moPoBR+XXfM9vXZQWxmM7QpLg2dJEwloy6FEY//kEF8=",
-  "source_note": "Final exact formatted source build recorded separately; initial build differed by one blank line only."
+  "source_note": "Changed Rust files and Cargo.lock match clean candidate 22ba3fc byte-for-byte. Build used separate Nix vendor correction and explicit Nixpkgs override.",
+  "final_full_package": "/nix/store/cnj3c56mvv2lkdxqw2f0dyqvbwz2nsxi-moonshine-0.16.1",
+  "final_source": "/nix/store/36fnrhvfb960dfzcsp0s8x3hg9149avw-source",
+  "final_checks": "fmt; workspace/all-targets check; workspace tests 138 passed, 1 ignored; all-targets Clippy -D warnings: passed"
 }

@@ -86,3 +86,13 @@ separate. Keep PR #1 draft: clarify/fix pixelforge's non-device-loss wait-error
 contract before recommending upstream submission as ready. There remains no
 demonstrated throughput or end-to-end-latency benefit; the intended benefit is
 less CPU blocking and scheduling flexibility, weighed against ownership cost.
+
+## Final clean-source verification
+
+Clean candidate `22ba3fc` passed formatting, workspace/all-targets compilation,
+workspace tests (138 passed, one ignored), and all-targets Clippy with warnings
+denied. The complete package also built with the separate ash vendor correction
+and explicit Nixpkgs revision `02c087f`; see `review-evidence/package-build.json`
+and compressed final logs. Runtime source bytes match the candidate exactly.
+PR head `ceddf41` has the same four-file upstream diff. No TV matrix was repeated
+for these timing/documentation-only revisions.
