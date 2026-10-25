@@ -1246,12 +1246,8 @@ mod tests {
 		let count = Arc::new(AtomicUsize::new(0));
 		let (tx, rx) = tokio::sync::mpsc::channel(1);
 		drop(rx);
-		let runtime = tokio::runtime::Builder::new_current_thread()
-			.enable_all()
-			.build()
-			.expect("runtime");
-		let rejected = runtime
-			.block_on(tx.send(InFlightGuard::new(&count)))
+		let rejected = tx
+			.blocking_send(InFlightGuard::new(&count))
 			.expect_err("receiver is closed");
 		assert_eq!(count.load(Ordering::Relaxed), 1);
 		drop(rejected);
