@@ -14,6 +14,47 @@ for its previous submission before reusing its command buffer. In-flight guards
 release admission slots on rejected delivery, queued cancellation and consumer
 early exits. Compositor frames stay on the encoding thread.
 
+## Blocking exceptional teardown contract (pinned pixelforge)
+
+**Do not undraft or merge this experiment until the dependency issue is fixed
+or a documented and reviewable GPU teardown contract is established.**
+
+The locked pixelforge revision is
+`4f3ff5e963a733e4036fd0bcb62df33daeb4ca94`. In its
+`src/converter/mod.rs`, `ColorConverter::wait_idle()` (around lines
+1099–1110) propagates an error from `vkWaitForFences` without clearing
+`in_flight`; `Drop` (around lines 1143–1169) ignores that error and
+unconditionally destroys the sampler, output buffer/memory, pipeline,
+fence and command pool. The source view also remains held on a failed
+wait. This is unsafe to assume complete if the GPU is still executing.
+
+The same pinned dependency's `VideoContextInner::drop` (in
+`src/vulkan.rs`, around lines 631–648) destroys retired semaphores and,
+for owned devices, destroys the Vulkan device without an explicit
+device-idle synchronization barrier. Retaining the DMA-BUF/Arc on the
+Moonshine side cannot repair premature destruction of GPU-side objects
+inside pixelforge.
+
+**Concrete failure sequence:** conversion submitted → outstanding GPU
+work → fence wait errors without proving completion → converter
+destructor ignores the error → GPU-referenced objects destroyed.
+No hardware reproduction is claimed; this is a source-level error-path
+safety concern. Normal-path tests and the abstract in-flight guard
+model do not exercise or prove this case.
+
+A safe fix belongs at the dependency's resource-owning layer. It must
+specify what happens after a fence wait fails, distinguish device loss
+from other errors, establish an actual completion barrier before
+destruction (or a documented fail-safe policy when completion cannot
+be established), and handle externally owned/adopted Vulkan devices.
+Do **not** treat a single retry, a leaked Arc, or an ignored error as
+proof of GPU completion. Prefer a fault-injection regression test that
+asserts resources are not destroyed after an unproven wait.
+
+Reference:
+- [Pinned converter source](https://github.com/hgaiser/pixelforge/blob/4f3ff5e963a733e4036fd0bcb62df33daeb4ca94/src/converter/mod.rs#L1099-L1169)
+- [Pinned context destructor](https://github.com/hgaiser/pixelforge/blob/4f3ff5e963a733e4036fd0bcb62df33daeb4ca94/src/vulkan.rs#L631-L648)
+
 ## Timing compatibility
 
 `FrameStats.convert` is retained for source compatibility. Its preferred label
