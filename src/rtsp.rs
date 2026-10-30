@@ -24,6 +24,15 @@ use crate::session::stream::video::VideoFormat;
 use crate::session::stream::video::VideoStreamConfig;
 use crate::session::stream::video::VideoStreamContext;
 
+/// Upper bound for one RTSP request (headers and SDP payload). The 2 KiB
+/// per-read buffer is not a limit: an incomplete request is retried with a
+/// growing String. Keep generous headroom for clients with extra SDP fields.
+const MAX_RTSP_REQUEST_BYTES: usize = 64 * 1024;
+
+fn rtsp_request_fits(current: usize, incoming: usize) -> bool {
+	current.checked_add(incoming).is_some_and(|size| size <= MAX_RTSP_REQUEST_BYTES)
+}
+
 #[repr(u8)]
 enum ServerCapabilities {
 	PenTouchEvents = 0x01,
@@ -515,6 +524,10 @@ impl RtspServer {
 				tracing::warn!("Received empty RTSP request.");
 				return Ok(());
 			}
+			if !rtsp_request_fits(message_buffer.len(), bytes_read) {
+				tracing::warn!("Rejected RTSP request exceeding {MAX_RTSP_REQUEST_BYTES} bytes from {address}");
+				return Err(());
+			}
 			message_buffer.push_str(
 				std::str::from_utf8(&buffer[..bytes_read])
 					.map_err(|e| tracing::warn!("Failed to convert message to string: {e}"))?,
@@ -621,4 +634,18 @@ fn get_sdp_attribute<F: FromStr>(sdp_session: &sdp_types::Session, attribute: &s
 		.trim()
 		.parse()
 		.map_err(|_| tracing::warn!("Attribute {attribute} can't be parsed."))
+}
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	#[test]
+	fn rtsp_request_size_is_bounded_including_incomplete_messages() {
+		assert!(rtsp_request_fits(0, 2048));
+		assert!(rtsp_request_fits(MAX_RTSP_REQUEST_BYTES - 2048, 2048));
+		assert!(!rtsp_request_fits(MAX_RTSP_REQUEST_BYTES - 2048, 2049));
+		assert!(!rtsp_request_fits(MAX_RTSP_REQUEST_BYTES, 1));
+		assert!(!rtsp_request_fits(usize::MAX, 1));
+	}
 }
