@@ -30,7 +30,9 @@ use crate::session::stream::video::VideoStreamContext;
 const MAX_RTSP_REQUEST_BYTES: usize = 64 * 1024;
 
 fn rtsp_request_fits(current: usize, incoming: usize) -> bool {
-	current.checked_add(incoming).is_some_and(|size| size <= MAX_RTSP_REQUEST_BYTES)
+	current
+		.checked_add(incoming)
+		.is_some_and(|size| size <= MAX_RTSP_REQUEST_BYTES)
 }
 
 #[repr(u8)]
