@@ -38,7 +38,11 @@ enum EncryptionFlags {
 }
 
 fn video_bitrate_bps(kbps: usize) -> Option<usize> {
-	kbps.checked_mul(1_000)
+	kbps.checked_mul(1_000).filter(|bps| *bps <= u32::MAX as usize)
+}
+
+fn valid_video_fps(fps: u32) -> bool {
+	fps != 0
 }
 
 #[derive(Clone)]
@@ -309,6 +313,10 @@ impl RtspServer {
 				return rtsp_response(cseq, request.version(), rtsp_types::StatusCode::BadRequest);
 			},
 		};
+		if !valid_video_fps(fps) {
+			tracing::warn!("Rejected zero client video frame rate");
+			return rtsp_response(cseq, request.version(), rtsp_types::StatusCode::BadRequest);
+		}
 		let requested_packet_size: usize = match get_sdp_attribute(&sdp_session, "x-nv-video[0].packetSize") {
 			Ok(packet_size) => packet_size,
 			Err(()) => {
@@ -638,9 +646,18 @@ mod tests {
 	fn client_bitrate_conversion_rejects_overflow() {
 		assert_eq!(video_bitrate_bps(0), Some(0));
 		assert_eq!(video_bitrate_bps(150_000), Some(150_000_000));
-		let largest_kbps = usize::MAX / 1_000;
+		// The encoder accepts u32 bits/sec, so the RTSP value must fit this too.
+		let largest_kbps = (u32::MAX as usize) / 1_000;
 		assert_eq!(video_bitrate_bps(largest_kbps), Some(largest_kbps * 1_000));
 		assert_eq!(video_bitrate_bps(largest_kbps + 1), None);
 		assert_eq!(video_bitrate_bps(usize::MAX), None);
+	}
+
+	#[test]
+	fn client_frame_rate_cannot_be_zero() {
+		assert!(!valid_video_fps(0));
+		assert!(valid_video_fps(1));
+		assert!(valid_video_fps(60));
+		assert!(valid_video_fps(240));
 	}
 }
