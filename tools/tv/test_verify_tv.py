@@ -45,5 +45,39 @@ class VerifyTVTests(unittest.TestCase):
             lookup.assert_not_called()
 
 
+    def test_start_refuses_failed_running_app_query(self):
+        fake = type("Result", (), {"returncode": 1, "stdout": "", "stderr": "device unavailable"})()
+        with tempfile.TemporaryDirectory() as directory, patch.object(module.shutil, "which", return_value="/bin/true"), patch.object(module, "get_running", return_value=fake), patch.object(module.subprocess, "run") as run:
+            rc = module.main(["start", "--device", "a", "--app-id", "com.example.moonlight",
+                              "--host-uuid", "123e4567-e89b-12d3-a456-426614174000",
+                              "--host-app-id", "3", "--out", directory, "--confirm"])
+            self.assertEqual(rc, 2)
+            run.assert_not_called()
+            self.assertEqual(list(Path(directory).iterdir()), [])
+
+    def test_start_never_reuses_nonempty_evidence_directory(self):
+        fake = type("Result", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+        with tempfile.TemporaryDirectory() as directory, patch.object(module.shutil, "which", return_value="/bin/true"), patch.object(module, "get_running", return_value=fake), patch.object(module.subprocess, "run") as run:
+            sentinel = Path(directory) / "existing.txt"
+            sentinel.write_text("preserve")
+            rc = module.main(["start", "--device", "a", "--app-id", "com.example.moonlight",
+                              "--host-uuid", "123e4567-e89b-12d3-a456-426614174000",
+                              "--host-app-id", "3", "--out", directory, "--confirm"])
+            self.assertEqual(rc, 2)
+            run.assert_not_called()
+            self.assertEqual(sentinel.read_text(), "preserve")
+
+    def test_collect_refuses_overwriting_existing_evidence(self):
+        fake = type("Result", (), {"returncode": 0, "stdout": "com.example.moonlight", "stderr": ""})()
+        with tempfile.TemporaryDirectory() as directory, patch.object(module.shutil, "which", return_value="/bin/true"), patch.object(module, "get_running", return_value=fake), patch.object(module.subprocess, "run") as run:
+            evidence = Path(directory) / "webos-running.txt"
+            evidence.write_text("original")
+            rc = module.main(["collect", "--device", "a", "--app-id", "com.example.moonlight",
+                              "--out", directory])
+            self.assertEqual(rc, 2)
+            run.assert_not_called()
+            self.assertEqual(evidence.read_text(), "original")
+
+
 if __name__ == "__main__":
     unittest.main()
