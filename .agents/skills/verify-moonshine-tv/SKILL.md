@@ -33,9 +33,15 @@ A live HDR pass requires observing actual HDR content and client/TV HDR operatio
 
 ## Cleanup
 
+Use the shared `tools/tv/tv_state.py` guard around authorized verification, not ad hoc mute commands. `run` records the original power, mute, and volume before muting. It restores the original mute state without changing volume and leaves an initially on TV on. An `ACTIVE` Home screensaver is an on-state, not standby. Sleeping, screen-off, or unknown power state is refused; no implicit wake or power-off is implemented. Never equate unreachable SSH with power-off.
+
+If a previous run left a pending state journal, inspect ownership and use the `restore-state` command printed in its `next_action`. Do not start another run or delete the journal to bypass recovery. Hard process kills cannot execute cleanup; the journal must remain recoverable. Restoration is a separate cleanup action, so an unrelated settings or logging failure cannot skip it.
+
 Stop the test from Moonlight's normal UI, only after confirming that the session still belongs to the test. Never use a broad `pkill`, close an unrelated TV app, modify persistent TV settings or power-cycle the TV as part of automated cleanup.
 
 Keep the evidence under `target/tv-verification/` after the app stops. If the app remains in an unknown state, record this and ask for an operator to inspect it instead of forcing termination.
+
+Every handoff report must state what the operator should do with it: finish a named recovery action, review evidence for a specific decision, or take no action. Collection alone never justifies merging a performance change.
 
 ## Helper tests and maintenance
 
@@ -43,4 +49,4 @@ Keep the evidence under `target/tv-verification/` after the app stops. If the ap
 python3 -m unittest discover -s tools/tv -p 'test_*.py'
 ```
 
-These exercise only dry-run construction and refusal to interrupt an active app. The skill and helper remain **provisional until a real LG C3 session validates parameterized launch**. If the installed Moonlight client differs from the source, update the helper and this skill only after proving the observed behavior.
+These exercise dry-run construction, refusal to interrupt an active app, and the state-preservation guard. Parameterized launch has since been validated on the physical LG C3: real streaming sessions started through this helper and were confirmed with independent host, client and TV evidence. If the installed Moonlight client differs from the source, update the helper and this skill only after proving the observed behavior.

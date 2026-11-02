@@ -1,6 +1,6 @@
 # LG/webOS Moonlight verification (fork-specific)
 
-**Status:** launch path source-reviewed and CLI command construction unit-tested; **not** validated on the physical LG C3. These helpers are specific to our fork and are not intended for the generic upstream Moonshine verification PR.
+**Status:** the guarded launcher has been exercised on the physical LG C3: real streaming sessions were started through `verify_tv.py start` and confirmed with independent host, client and TV evidence (desktop and game workloads, November 2026). The bounded `run` lifecycle and `restore-state` recovery are offline-tested and use the same state guard exercised during those runs. These helpers are specific to our fork and are not intended for the generic upstream Moonshine verification PR.
 
 ## Why launch parameters may work
 
@@ -63,3 +63,39 @@ Start by reproducing the known 4K60 HDR throughput issue under the deployed host
 This tool deliberately has no `stop` command: it cannot know whether an app started by a previous test has since become a user's active streaming session. End the session using Moonlight's normal interface after verifying that it still belongs to the test. Never kill arbitrary processes by name. No commands should contact the TV before user-authorized local testing.
 
 Run offline command-safety tests with `python3 -m unittest discover -s tools/tv -p 'test_*.py'`.
+
+## Run a bounded observation
+
+`run` is fork-specific and contacts the local host and the TV. Configure the Moonlight settings before you start. The command records power, mute, and volume before automatically muting an idle TV. It verifies mute before launching. It does not wake the TV, send input, change client settings, or stop a session. The minimal `start` action remains a launch request only; use `run` for state-preserving verification.
+
+```sh
+python3 tools/tv/verify_tv.py run --device living-room --ssh-alias living-room-ssh \
+  --app-id YOUR_MOONLIGHT_APP_ID --host-uuid YOUR_PAIRED_HOST_UUID --host-app-id 1 \
+  --host-pid YOUR_MOONSHINE_PID --journal-unit YOUR_SYSTEM_SERVICE \
+  --duration 60 --interval 15 --settings-confirmed --confirm --out target/tv-verification/run-002
+```
+
+The SSH alias must permit status queries and `com.webos.audio/setMuted`. The local PID must own the listener on `--host-port` (default 47989). The host's `serverinfo` UUID must match the paired UUID and its state must be free. Procfs, server status, TV running-app status, power, foreground app, mute, volume, video status, and the system journal must be accessible; use `--journal-scope user` for a user service. The TV must report `ACTIVE` with substate `active` or `screen saver`, be on its home screen, and have no active video output. An active screensaver is still an on-state, not standby. Sleeping, screen-off, unknown, or active-session state prevents mutation. These checks cannot fence another remote client, so the operator must still reserve the TV. The shared local lock prevents overlapping cooperative runs on this host.
+
+For a system service the default journal query includes all accessible journals, because logs from a system service running as a regular user may be stored in that user's journal.
+
+The output directory must not exist. The command preserves the plan, doctor result, host preflight responses, TV status, launch result, and timestamped samples with journal snapshots. Sampling starts after launch, repeats at the requested interval, and includes an end sample. Command timeouts add to the observation duration. Interrupts and errors leave partial evidence and a report when possible. Exit 0 means collection and audio restoration finished, not that playback worked. A pending restoration returns nonzero. A successful launch request is not a successful stream or input action. Inspect independent client statistics, display and HDR evidence, and host logs to establish playback and quality. Reports include `next_action` stating how to use the evidence or finish cleanup.
+
+No available status proves that a later session is still owned by this run. The command leaves it alone even after an error or interrupt. Inspect the TV and host, then use Moonlight's normal interface to stop the test only if it still belongs to you. If launch timed out or failed, it may still have reached the TV. Check before retrying.
+
+## Preserve audio and recover after interruption
+
+`run` records the original TV state through `tv_state.py`. Before muting, the guard atomically saves the original state in the run's `tv-state.json` and a private pending journal under `$XDG_STATE_HOME/moonshine-tv/pending-state.json`, or `~/.local/state/moonshine-tv/pending-state.json` when that variable is unset. A pending journal blocks new runs so they cannot mistake the test's mute setting for the operator's original setting.
+
+Cleanup restores the original mute setting and verifies that volume remains unchanged. An already-muted TV stays muted. A TV that was on stays on. The guard never changes volume or overwrites a detected external volume change. It refuses to unmute while Moonlight remains running or the TV has another foreground app or active video. The bounded observation command therefore leaves restoration pending until the owned test is stopped normally.
+
+`SIGINT` and `SIGTERM` trigger best-effort cleanup. `SIGKILL`, a terminal abort that kills all processes, or host failure cannot run Python cleanup. The journal survives these cases. After inspecting ownership and stopping only the owned test through its normal UI, run the recovery command printed in `next_action`, for example:
+
+```sh
+python3 tools/tv/verify_tv.py restore-state --device living-room --ssh-alias living-room-ssh \
+  --app-id YOUR_MOONLIGHT_APP_ID --out /absolute/path/to/original-run --confirm
+```
+
+The command is idempotent. It validates the original run and SSH alias before contacting the TV. Do not delete a pending journal to bypass a restoration error. Inspect the error and preserve any operator changes instead.
+
+Automatic wake and power-off are deliberately disabled. An SSH failure does not establish that the TV was off. A future wake implementation must record a known initial power state before waking and restore it through a verified power-control path. Turning the screen off is not the same as returning the TV to standby. For now, the guard refuses that situation rather than guessing.
