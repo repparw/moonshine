@@ -34,5 +34,16 @@ class VerifyTVTests(unittest.TestCase):
             self.assertFalse((Path(directory) / "report.json").exists())
 
 
+    def test_start_without_confirmation_never_queries_device(self):
+        with patch.object(module, "get_running") as status, patch.object(module.shutil, "which") as lookup:
+            with self.assertRaises(SystemExit) as caught:
+                module.main(["start", "--device", "a", "--app-id", "b",
+                             "--host-uuid", "123e4567-e89b-12d3-a456-426614174000",
+                             "--host-app-id", "3", "--out", "unused"])
+            self.assertEqual(caught.exception.code, 2)
+            status.assert_not_called()
+            lookup.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()
