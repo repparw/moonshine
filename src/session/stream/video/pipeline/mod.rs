@@ -133,7 +133,7 @@ fn wait_percentiles(samples: &mut [u64]) -> (Option<u64>, Option<u64>, Option<u6
 		return (None, None, None);
 	}
 	samples.sort_unstable();
-	let percentile = |percent: usize| samples[(samples.len() - 1) * percent / 100];
+	let percentile = |percent: usize| samples[(samples.len() * percent / 100).min(samples.len() - 1)];
 	(Some(percentile(50)), Some(percentile(95)), Some(percentile(99)))
 }
 
@@ -1263,9 +1263,17 @@ impl VideoPipelineInner {
 
 #[cfg(test)]
 mod tests {
-	use super::drm_fourcc_to_input;
+	use super::{drm_fourcc_to_input, wait_percentiles};
 	use ash::vk;
 	use pixelforge::RgbFormat;
+
+	#[test]
+	fn capture_wait_percentiles_handle_empty_and_short_windows() {
+		assert_eq!(wait_percentiles(&mut []), (None, None, None));
+		assert_eq!(wait_percentiles(&mut [42]), (Some(42), Some(42), Some(42)));
+		let mut samples = [8, 2, 6, 4, 10];
+		assert_eq!(wait_percentiles(&mut samples), (Some(6), Some(10), Some(10)));
+	}
 
 	// DRM fourccs — kept in the test module to document the byte ordering
 	// explicitly and guard against accidental typos in the production match.
