@@ -118,6 +118,63 @@ fn is_hdr(encoder: &Encoder) -> bool {
 
 pub(crate) struct VideoPipeline {}
 
+/// Captures blocking waits on the encoding thread that are not included in
+/// the asynchronous packet consumer's per-frame timing breakdown. Kept separate
+/// because a source-release wait may complete after the consumer has reported
+/// that frame's statistics.
+struct CaptureWaitStats {
+	last_report: std::time::Instant,
+	acquire_fence_us: Vec<u64>,
+	source_release_us: Vec<u64>,
+}
+
+fn wait_percentiles(samples: &mut [u64]) -> (Option<u64>, Option<u64>, Option<u64>) {
+	if samples.is_empty() {
+		return (None, None, None);
+	}
+	samples.sort_unstable();
+	let percentile = |percent: usize| samples[(samples.len() - 1) * percent / 100];
+	(Some(percentile(50)), Some(percentile(95)), Some(percentile(99)))
+}
+
+impl CaptureWaitStats {
+	fn new() -> Self {
+		Self {
+			last_report: std::time::Instant::now(),
+			acquire_fence_us: Vec::with_capacity(512),
+			source_release_us: Vec::with_capacity(512),
+		}
+	}
+
+	fn log_if_due(&mut self) {
+		let elapsed = self.last_report.elapsed();
+		if elapsed < std::time::Duration::from_secs(5) {
+			return;
+		}
+		let acquire_samples = self.acquire_fence_us.len();
+		let release_samples = self.source_release_us.len();
+		let (acquire_p50_us, acquire_p95_us, acquire_p99_us) =
+			wait_percentiles(&mut self.acquire_fence_us);
+		let (release_p50_us, release_p95_us, release_p99_us) =
+			wait_percentiles(&mut self.source_release_us);
+		tracing::debug!(
+			window_ms = elapsed.as_millis() as u64,
+			acquire_samples,
+			acquire_p50_us = ?acquire_p50_us,
+			acquire_p95_us = ?acquire_p95_us,
+			acquire_p99_us = ?acquire_p99_us,
+			release_samples,
+			release_p50_us = ?release_p50_us,
+			release_p95_us = ?release_p95_us,
+			release_p99_us = ?release_p99_us,
+			"Capture and encoder-source wait summary (μs)"
+		);
+		self.acquire_fence_us.clear();
+		self.source_release_us.clear();
+		self.last_report = std::time::Instant::now();
+	}
+}
+
 /// A single frame's latency breakdown for periodic summary reporting.
 struct LatencySample {
 	channel_wait: std::time::Duration,
@@ -802,6 +859,7 @@ impl VideoPipelineInner {
 		// Encoding loop - receives frames from compositor.
 		let frame_interval = std::time::Duration::from_secs_f64(1.0 / ctx.fps as f64);
 		let mut last_frame_time = std::time::Instant::now();
+		let mut capture_wait_stats = CaptureWaitStats::new();
 
 		// DMA-BUF importer for zero-copy capture (initialized on first DMA-BUF frame).
 		let mut dmabuf_importer: Option<DmaBufImporter> = None;
@@ -1014,11 +1072,16 @@ impl VideoPipelineInner {
 
 				// Wait for the compositor's render to finish before reading the
 				// buffer. `None` means it already had.
-				if let Some(fence) = &dmabuf_frame.acquire_fence
-					&& let Err(e) = fence::wait_sync_file(fence.as_fd(), fence::FENCE_TIMEOUT)
-				{
-					tracing::warn!("Dropping frame: {e}");
-					continue;
+				if let Some(fence) = &dmabuf_frame.acquire_fence {
+					let wait_started = std::time::Instant::now();
+					let result = fence::wait_sync_file(fence.as_fd(), fence::FENCE_TIMEOUT);
+					capture_wait_stats
+						.acquire_fence_us
+						.push(wait_started.elapsed().as_micros() as u64);
+					if let Err(e) = result {
+						tracing::warn!("Dropping frame: {e}");
+						continue;
+					}
 				}
 
 				// The planes borrow the frame's fds, which stay open until the
@@ -1152,7 +1215,12 @@ impl VideoPipelineInner {
 						// The encode itself is already queued, so this wait does not
 						// delay the frame; it is the colour conversion, well under a
 						// frame interval.
-						if let Err(e) = import.source().wait_released() {
+						let wait_started = std::time::Instant::now();
+						let release_result = import.source().wait_released();
+						capture_wait_stats
+							.source_release_us
+							.push(wait_started.elapsed().as_micros() as u64);
+						if let Err(e) = release_result {
 							tracing::warn!("Failed to wait for the encoder to read a frame: {e}");
 						}
 						drop(frame);
@@ -1173,6 +1241,7 @@ impl VideoPipelineInner {
 				}
 
 				has_encoded = true;
+				capture_wait_stats.log_if_due();
 			}
 		}
 
