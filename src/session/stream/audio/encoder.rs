@@ -214,8 +214,6 @@ impl AudioEncoderInner {
 				},
 			};
 
-			let timestamp = rtp_clock.next_timestamp();
-
 			// Read current keys from watch channel.
 			let keys = &*keys_rx.borrow();
 
@@ -239,6 +237,10 @@ impl AudioEncoderInner {
 				},
 				false => encoded_audio[..encoded_size].to_vec(),
 			};
+
+			// Advance only when an audio packet is ready to transmit; errors must
+			// not create a gap in the FEC block's inferred base timestamp.
+			let timestamp = rtp_clock.next_timestamp();
 
 			let shard = &mut shards[sequence_number as usize % NR_DATA_SHARDS];
 
