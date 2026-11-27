@@ -11,7 +11,8 @@ Fork-only (`repparw/moonshine`) procedure for authorized physical LG C3 tests. R
 
 1. **Probe read-only state first** using `homelab-devices` `tv/bin/tv-snapshot` (or `verify_tv.py doctor` in `nix develop`):
    ```sh
-   /home/repparw/Projects/homelab-devices/tv/bin/tv-snapshot
+   <homelab-devices>/tv/bin/tv-snapshot
+   nix develop -c python3 tools/tv/verify_tv.py doctor --device <alias> --app-id <app-id>
    nix develop -c python3 tools/tv/verify_tv.py plan --device <alias> --app-id <app-id> --host-uuid <uuid> --host-app-id <id>
    ```
    Confirm the TV is on Home with no active video, Moonlight is idle, and the shared TV GUI lock (`homelab-tv/gui.lock`) is free.

@@ -37,7 +37,7 @@ def running_apps(status):
     return apps
 
 
-def main(argv=None):
+def main(argv=None, *, _lock_held=False):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("plan", "doctor", "start", "collect", "run", "restore-state"))
     parser.add_argument("--device", required=True, help="existing webOS CLI device alias, not an IP address")
@@ -63,7 +63,7 @@ def main(argv=None):
             parser.error("invalid SSH alias")
         import bounded_tv
         try:
-            lock, meta_file = bounded_tv._acquire_tv_lock(f"verify_tv restore-state {args.app_id}")
+            lock, meta_file = bounded_tv.acquire_tv_lock(f"verify_tv restore-state {args.app_id}")
         except RuntimeError as exc:
             print(f"TV restoration deferred: {exc}", file=sys.stderr)
             return 2
@@ -75,7 +75,7 @@ def main(argv=None):
             print(f"TV restoration deferred: {exc}", file=sys.stderr)
             return 2
         finally:
-            bounded_tv._release_tv_lock(lock, meta_file)
+            bounded_tv.release_tv_lock(lock, meta_file)
         print(json.dumps({"tv_state_restored": True, "next_action": "TV state restored; retain this run's evidence. No TV action is required."}))
         return 0
 
@@ -109,59 +109,84 @@ def main(argv=None):
     if not shutil.which("ares-launch"):
         print("ares-launch missing; install/configure webOS TV CLI first", file=sys.stderr)
         return 2
-    try:
-        status = get_running(args.device)
-    except (OSError, subprocess.TimeoutExpired) as exc:
-        print(f"Could not query TV state: {exc}", file=sys.stderr)
-        return 2
-    if status.returncode != 0:
-        print(status.stdout + status.stderr, file=sys.stderr)
-        return 2
-    try:
-        is_running = args.app_id in running_apps(status)
-    except RuntimeError as exc:
-        print(str(exc), file=sys.stderr)
-        return 2
-    if args.action == "doctor":
-        print(json.dumps({"device": args.device, "app_id": args.app_id, "moonlight_running": is_running, "raw": status.stdout}, indent=2))
-        return 0
-    if args.action == "collect":
-        if args.out is None:
-            parser.error("collect requires --out")
-        args.out.mkdir(parents=True, exist_ok=True)
-        dest = args.out / "webos-running.txt"
-        if dest.exists():
-            print("Refusing to overwrite collected evidence", file=sys.stderr)
+
+    lock_pair = None
+    if args.action == "start" and not _lock_held:
+        import bounded_tv
+        try:
+            lock_pair = bounded_tv.acquire_tv_lock(f"verify_tv start {args.app_id}")
+        except RuntimeError as exc:
+            print(str(exc), file=sys.stderr)
             return 2
-        dest.write_text(status.stdout)
-        print(json.dumps({"running": is_running, "evidence": str(dest), "stream_verified": False}, indent=2))
-        return 0
-    if is_running:
-        print("Moonlight is already running: refusing to interrupt an active client", file=sys.stderr)
-        return 2
-    args.out.mkdir(parents=True, exist_ok=True)
-    if any(args.out.iterdir()):
-        print("Refusing to reuse a nonempty evidence directory", file=sys.stderr)
-        return 2
+
     try:
-        result = subprocess.run(command, capture_output=True, text=True, timeout=30)
-    except (OSError, subprocess.TimeoutExpired) as exc:
-        print(f"TV launch failed: {exc}", file=sys.stderr)
-        return 2
-    report = {
-        "time_utc": datetime.now(timezone.utc).isoformat(),
-        "device": args.device,
-        "app_id": args.app_id,
-        "command": command,
-        "launch_exit_code": result.returncode,
-        "launched": result.returncode == 0,
-        "video_stream_verified": False,
-        "note": "Launch request only; manual or client telemetry required for decode/HDR/display verification",
-    }
-    (args.out / "ares-launch.log").write_text(result.stdout + result.stderr)
-    (args.out / "report.json").write_text(json.dumps(report, indent=2) + "\n")
-    print(json.dumps({"report": str(args.out / "report.json"), "launch_exit_code": result.returncode, "stream_verified": False}, indent=2))
-    return 0 if result.returncode == 0 else 1
+        try:
+            status = get_running(args.device)
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            print(f"Could not query TV state: {exc}", file=sys.stderr)
+            return 2
+        if status.returncode != 0:
+            print(status.stdout + status.stderr, file=sys.stderr)
+            return 2
+        try:
+            is_running = args.app_id in running_apps(status)
+        except RuntimeError as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
+        if args.action == "doctor":
+            import bounded_tv
+            lock_path = bounded_tv.resolve_lock_path()
+            lock_holder = None if _lock_held else bounded_tv.check_tv_lock_free(lock_path)
+            print(json.dumps({
+                "device": args.device,
+                "app_id": args.app_id,
+                "moonlight_running": is_running,
+                "tv_gui_lock": lock_path,
+                "tv_gui_lock_holder": lock_holder,
+                "raw": status.stdout,
+            }, indent=2))
+            return 0
+        if args.action == "collect":
+            if args.out is None:
+                parser.error("collect requires --out")
+            args.out.mkdir(parents=True, exist_ok=True)
+            dest = args.out / "webos-running.txt"
+            if dest.exists():
+                print("Refusing to overwrite collected evidence", file=sys.stderr)
+                return 2
+            dest.write_text(status.stdout)
+            print(json.dumps({"running": is_running, "evidence": str(dest), "stream_verified": False}, indent=2))
+            return 0
+        if is_running:
+            print("Moonlight is already running: refusing to interrupt an active client", file=sys.stderr)
+            return 2
+        args.out.mkdir(parents=True, exist_ok=True)
+        if any(args.out.iterdir()):
+            print("Refusing to reuse a nonempty evidence directory", file=sys.stderr)
+            return 2
+        try:
+            result = subprocess.run(command, capture_output=True, text=True, timeout=30)
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            print(f"TV launch failed: {exc}", file=sys.stderr)
+            return 2
+        report = {
+            "time_utc": datetime.now(timezone.utc).isoformat(),
+            "device": args.device,
+            "app_id": args.app_id,
+            "command": command,
+            "launch_exit_code": result.returncode,
+            "launched": result.returncode == 0,
+            "video_stream_verified": False,
+            "note": "Launch request only; manual or client telemetry required for decode/HDR/display verification",
+        }
+        (args.out / "ares-launch.log").write_text(result.stdout + result.stderr)
+        (args.out / "report.json").write_text(json.dumps(report, indent=2) + "\n")
+        print(json.dumps({"report": str(args.out / "report.json"), "launch_exit_code": result.returncode, "stream_verified": False}, indent=2))
+        return 0 if result.returncode == 0 else 1
+    finally:
+        if lock_pair is not None:
+            import bounded_tv
+            bounded_tv.release_tv_lock(*lock_pair)
 
 
 if __name__ == "__main__":

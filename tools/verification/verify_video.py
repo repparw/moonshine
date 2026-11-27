@@ -4,6 +4,7 @@
 import argparse
 import contextlib
 from datetime import datetime, timezone
+import errno
 import fcntl
 import hashlib
 import json
@@ -33,7 +34,7 @@ def default_hw_lock_path():
     override = os.environ.get("MOONSHINE_HW_LOCK_PATH")
     if override:
         return Path(override)
-    state_home = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local/state"))
+    state_home = Path(os.environ.get("XDG_STATE_HOME") or (Path.home() / ".local/state"))
     return state_home / "moonshine-bench" / "hw.lock"
 
 
@@ -75,11 +76,34 @@ def load_compare_sha256(target):
         raise ValueError(f"--compare-against path does not exist: {target}")
     if path.suffix == ".json":
         data = json.loads(path.read_text())
-        sha = (data.get("preflight") or {}).get("bench_provenance", {}).get("sha256") or data.get("bench_sha256")
-        if not sha:
+        if not isinstance(data, dict):
+            raise ValueError(f"report {target} must be a JSON object")
+        preflight_data = data.get("preflight")
+        provenance = preflight_data.get("bench_provenance") if isinstance(preflight_data, dict) else None
+        sha = (provenance.get("sha256") if isinstance(provenance, dict) else None) or data.get("bench_sha256")
+        if not isinstance(sha, str) or not sha:
             raise ValueError(f"report {target} has no recorded bench sha256")
         return sha
     return sha256_file(path)
+
+
+def count_unreadable_fdinfo_pids(proc_root=Path("/proc")):
+    """Count numeric /proc/<pid>/fdinfo directories unreadable due to permissions."""
+    unreadable = 0
+    try:
+        entries = list(proc_root.iterdir())
+    except OSError:
+        return -1
+    for pid_dir in entries:
+        if not pid_dir.name.isdigit():
+            continue
+        try:
+            list((pid_dir / "fdinfo").iterdir())
+        except PermissionError:
+            unreadable += 1
+        except OSError:
+            continue
+    return unreadable
 
 
 def sample_vcn_clients(proc_root=Path("/proc")):
@@ -130,8 +154,9 @@ def detect_active_vcn(sample_seconds=VCN_SAMPLE_SECONDS, proc_root=Path("/proc")
     second = sample_vcn_clients(proc_root)
     active = []
     for key, (comm, ns_after) in second.items():
-        ns_before = first[key][1] if key in first else 0
-        delta_ns = ns_after - ns_before
+        if key not in first:
+            continue
+        delta_ns = ns_after - first[key][1]
         if delta_ns > 0:
             active.append({"pid": key[0], "comm": comm, "client_id": key[1], "delta_ns": delta_ns})
     active.sort(key=lambda item: (-item["delta_ns"], item["pid"]))
@@ -139,16 +164,27 @@ def detect_active_vcn(sample_seconds=VCN_SAMPLE_SECONDS, proc_root=Path("/proc")
 
 
 def check_moonshine_server_free(port=SERVERINFO_PORT):
-    """Return active server status dict if Moonshine is streaming, else None."""
+    """Return active/unknown server status dict if Moonshine is streaming or unhealthy, else None."""
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
     try:
-        with urllib.request.urlopen(f"http://127.0.0.1:{port}/serverinfo", timeout=1) as response:
+        with opener.open(f"http://127.0.0.1:{port}/serverinfo", timeout=1) as response:
             raw = response.read(256 * 1024)
-    except (OSError, urllib.error.URLError):
+    except urllib.error.HTTPError as exc:
+        return {"error": f"serverinfo HTTP {exc.code}: {exc.reason}"}
+    except urllib.error.URLError as exc:
+        if isinstance(exc.reason, ConnectionRefusedError):
+            return None
+        return {"error": f"serverinfo unreachable: {exc.reason}"}
+    except ConnectionRefusedError:
         return None
+    except OSError as exc:
+        return {"error": f"serverinfo error: {exc}"}
     try:
         root = ET.fromstring(raw)
     except ET.ParseError as exc:
         return {"error": f"invalid serverinfo XML: {exc}"}
+    if root.tag != "root" or root.get("status_code") != "200":
+        return {"error": "invalid serverinfo status", "tag": root.tag, "status_code": root.get("status_code")}
     state = root.findtext("state")
     current_game = root.findtext("currentgame")
     if (state, current_game) != ("MOONSHINE_SERVER_FREE", "0"):
@@ -171,12 +207,14 @@ def check_hw_lock_free(lock_path):
     if not lock_path.exists():
         return None
     try:
-        with open(lock_path, "a") as handle:
-            fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        with open(lock_path, "r") as handle:
+            fcntl.flock(handle, fcntl.LOCK_SH | fcntl.LOCK_NB)
             fcntl.flock(handle, fcntl.LOCK_UN)
         return None
-    except OSError:
-        return read_lock_meta(lock_path) or {"lock_path": str(lock_path)}
+    except OSError as exc:
+        if exc.errno in (errno.EAGAIN, errno.EWOULDBLOCK):
+            return read_lock_meta(lock_path) or {"lock_path": str(lock_path)}
+        return {"lock_path": str(lock_path), "error": str(exc)}
 
 
 @contextlib.contextmanager
@@ -184,14 +222,19 @@ def acquire_hw_lock(lock_path, purpose):
     lock_path = Path(lock_path)
     lock_path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
     meta_path = Path(f"{lock_path}.meta")
-    handle = open(lock_path, "a")
+    try:
+        handle = open(lock_path, "a")
+    except OSError as exc:
+        raise RuntimeError(f"host GPU benchmark lock cannot be opened ({lock_path}): {exc}") from exc
     try:
         fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except OSError as exc:
         handle.close()
-        holder = read_lock_meta(lock_path)
-        detail = f" (held by {json.dumps(holder)})" if holder else ""
-        raise RuntimeError(f"host GPU benchmark lock unavailable: {exc}{detail}") from exc
+        if exc.errno in (errno.EAGAIN, errno.EWOULDBLOCK):
+            holder = read_lock_meta(lock_path)
+            detail = f" (held by {json.dumps(holder)})" if holder else ""
+            raise RuntimeError(f"host GPU benchmark lock unavailable: {exc}{detail}") from exc
+        raise RuntimeError(f"host GPU benchmark lock failed ({lock_path}): {exc}") from exc
     meta = {
         "pid": os.getpid(),
         "owner": "moonshine-verify-video",
@@ -215,7 +258,15 @@ def acquire_hw_lock(lock_path, purpose):
             handle.close()
 
 
-def preflight(app, bench, allow_vcn_busy=False, compare_against=None, lock_path=None):
+def preflight(
+    app,
+    bench,
+    allow_vcn_busy=False,
+    compare_against=None,
+    lock_path=None,
+    check_lock=True,
+    host_port=SERVERINFO_PORT,
+):
     problems = []
     app_path = resolve_executable(app)
     bench_path = resolve_executable(bench)
@@ -243,17 +294,18 @@ def preflight(app, bench, allow_vcn_busy=False, compare_against=None, lock_path=
         check_port_free()
     except OSError as exc:
         problems.append(f"UDP 127.0.0.1:{VIDEO_PORT} unavailable ({exc}); possible active Moonshine stream")
-    active_server = check_moonshine_server_free()
+    active_server = check_moonshine_server_free(port=host_port)
     if active_server is not None:
         problems.append(f"production Moonshine server is not idle ({active_server}); refusing to contend with live stream")
     active_vcn = detect_active_vcn()
+    vcn_unreadable_pids = count_unreadable_fdinfo_pids()
     if active_vcn and not allow_vcn_busy:
         summary = ", ".join(f"{item['comm']}(pid={item['pid']})" for item in active_vcn)
         problems.append(
             f"active VCN video decode/encode detected ({summary}); pause playback or pass --allow-vcn-busy"
         )
     resolved_lock = Path(lock_path) if lock_path is not None else default_hw_lock_path()
-    lock_holder = check_hw_lock_free(resolved_lock)
+    lock_holder = check_hw_lock_free(resolved_lock) if check_lock else None
     if lock_holder is not None:
         problems.append(f"host GPU benchmark lock held ({lock_holder})")
     return {
@@ -262,6 +314,7 @@ def preflight(app, bench, allow_vcn_busy=False, compare_against=None, lock_path=
         "bench_provenance": provenance,
         "render_nodes": usable,
         "active_vcn": active_vcn,
+        "vcn_unreadable_pids": vcn_unreadable_pids,
         "moonshine_server_busy": active_server,
         "hw_lock": str(resolved_lock),
         "hw_lock_holder": lock_holder,
@@ -281,6 +334,32 @@ def summarize(log):
     }
 
 
+def _stop_process_group(process):
+    # Only signal our own process group; never kill by process name.
+    try:
+        os.killpg(process.pid, signal.SIGINT)
+    except ProcessLookupError:
+        pass
+    try:
+        log, _ = process.communicate(timeout=10)
+        return log
+    except subprocess.TimeoutExpired:
+        try:
+            os.killpg(process.pid, signal.SIGTERM)
+        except ProcessLookupError:
+            pass
+        try:
+            log, _ = process.communicate(timeout=3)
+            return log
+        except subprocess.TimeoutExpired:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            log, _ = process.communicate()
+            return log
+
+
 def run_benchmark(command, timeout_seconds):
     process = subprocess.Popen(
         command,
@@ -296,26 +375,10 @@ def run_benchmark(command, timeout_seconds):
         log, _ = process.communicate(timeout=timeout_seconds)
     except subprocess.TimeoutExpired:
         timed_out = True
-        # Only signal our own process group; never kill by process name.
-        try:
-            os.killpg(process.pid, signal.SIGINT)
-        except ProcessLookupError:
-            pass
-        try:
-            log, _ = process.communicate(timeout=10)
-        except subprocess.TimeoutExpired:
-            try:
-                os.killpg(process.pid, signal.SIGTERM)
-            except ProcessLookupError:
-                pass
-            try:
-                log, _ = process.communicate(timeout=3)
-            except subprocess.TimeoutExpired:
-                try:
-                    os.killpg(process.pid, signal.SIGKILL)
-                except ProcessLookupError:
-                    pass
-                log, _ = process.communicate()
+        log = _stop_process_group(process)
+    except KeyboardInterrupt:
+        _stop_process_group(process)
+        raise
     return process.returncode, timed_out, log
 
 
@@ -332,12 +395,20 @@ def main(argv=None):
     parser.add_argument("--warmup", type=int, default=3)
     parser.add_argument("--hdr", action="store_true", help="HDR session mode; does not prove HDR content")
     parser.add_argument("--min-fps", type=float, default=0.0, help="optional environment-specific throughput gate")
+    parser.add_argument("--host-port", type=int, default=SERVERINFO_PORT, help="Moonshine serverinfo HTTP port")
     parser.add_argument("--allow-vcn-busy", action="store_true", help="allow running while another process uses VCN")
     parser.add_argument("--compare-against", help="baseline binary or report.json; fail if sha256 matches")
     parser.add_argument("--output", type=Path, help="artifact directory (default: target/verification/<timestamp>)")
     args = parser.parse_args(argv)
-    if args.duration <= args.warmup or args.warmup < 0 or args.fps <= 0 or args.bitrate <= 0 or args.min_fps < 0:
-        parser.error("require duration > warmup >= 0, fps > 0, bitrate > 0 and min-fps >= 0")
+    if (
+        args.duration <= args.warmup
+        or args.warmup < 0
+        or args.fps <= 0
+        or args.bitrate <= 0
+        or args.min_fps < 0
+        or not (1 <= args.host_port <= 65535)
+    ):
+        parser.error("require duration > warmup >= 0, fps > 0, bitrate > 0, min-fps >= 0 and valid host-port")
 
     lock_path = default_hw_lock_path()
     if args.action == "doctor":
@@ -347,6 +418,8 @@ def main(argv=None):
             allow_vcn_busy=args.allow_vcn_busy,
             compare_against=args.compare_against,
             lock_path=lock_path,
+            check_lock=True,
+            host_port=args.host_port,
         )
         print(json.dumps(checks, indent=2))
         return 1 if checks["problems"] else 0
@@ -358,18 +431,22 @@ def main(argv=None):
         print(str(exc), file=sys.stderr)
         return 2
 
+    old_sigterm = signal.getsignal(signal.SIGTERM)
+
+    def _handle_sigterm(signum, frame):
+        raise KeyboardInterrupt
+
     try:
+        signal.signal(signal.SIGTERM, _handle_sigterm)
         checks = preflight(
             args.app,
             args.bench,
             allow_vcn_busy=args.allow_vcn_busy,
             compare_against=args.compare_against,
-            lock_path=None,
+            lock_path=lock_path,
+            check_lock=False,
+            host_port=args.host_port,
         )
-        # Ignore our own lock in preflight by clearing self-held lock checks.
-        if checks.get("hw_lock_holder") and checks["hw_lock_holder"].get("pid") == os.getpid():
-            checks["hw_lock_holder"] = None
-            checks["problems"] = [p for p in checks["problems"] if not p.startswith("host GPU benchmark lock held")]
         if checks["problems"]:
             print(json.dumps(checks, indent=2), file=sys.stderr)
             return 2
@@ -422,7 +499,11 @@ def main(argv=None):
         (out / "report.json").write_text(json.dumps(report, indent=2) + "\n")
         print(json.dumps({"report": str(out / "report.json"), "verdict": report["verdict"], "results": stats, "problems": problems}, indent=2))
         return 1 if problems else 0
+    except KeyboardInterrupt:
+        print("Smoke run interrupted; benchmark process group stopped", file=sys.stderr)
+        return 130
     finally:
+        signal.signal(signal.SIGTERM, old_sigterm)
         lock_cm.__exit__(None, None, None)
 
 

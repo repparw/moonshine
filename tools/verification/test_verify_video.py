@@ -8,6 +8,7 @@ import socket
 from pathlib import Path
 import tempfile
 import unittest
+import urllib.error
 from unittest.mock import patch
 
 MODULE = Path(__file__).with_name("verify_video.py")
@@ -105,7 +106,7 @@ class VerifyVideoTests(unittest.TestCase):
 
     def test_detect_active_vcn_ignores_static_counter_and_flags_increasing(self):
         first = {(101, "1"): ("helium", 5000), (202, "2"): ("firefox", 9000)}
-        second = {(101, "1"): ("helium", 8500), (202, "2"): ("firefox", 9000)}
+        second = {(101, "1"): ("helium", 8500), (202, "2"): ("firefox", 9000), (303, "3"): ("transient", 4000)}
         with patch.object(verify_video, "sample_vcn_clients", side_effect=[first, second]):
             active = verify_video.detect_active_vcn(sample_seconds=0)
         self.assertEqual(len(active), 1)
@@ -145,6 +146,21 @@ class VerifyVideoTests(unittest.TestCase):
         self.assertTrue(any("CARGO_TARGET_DIR collision" in p for p in collided["problems"]))
         self.assertEqual(distinct["problems"], [])
 
+    def test_load_compare_sha256_handles_null_provenance_and_non_dict_json(self):
+        null_prov = Path(self.temp.name) / "null_prov.json"
+        null_prov.write_text(json.dumps({"preflight": {"bench_provenance": None}}))
+        with self.assertRaises(ValueError):
+            verify_video.load_compare_sha256(null_prov)
+
+        list_json = Path(self.temp.name) / "list.json"
+        list_json.write_text("[]")
+        with self.assertRaises(ValueError):
+            verify_video.load_compare_sha256(list_json)
+
+        valid = Path(self.temp.name) / "valid.json"
+        valid.write_text(json.dumps({"preflight": {"bench_provenance": None}, "bench_sha256": "deadbeef"}))
+        self.assertEqual(verify_video.load_compare_sha256(valid), "deadbeef")
+
     def test_preflight_rejects_active_moonshine_server(self):
         fake_bench = Path(self.temp.name) / "bench"
         fake_bench.write_text("#!/bin/sh\n")
@@ -157,6 +173,28 @@ class VerifyVideoTests(unittest.TestCase):
             res = verify_video.preflight("vkcube", str(fake_bench), lock_path=self.lock_path)
         self.assertTrue(any("production Moonshine server is not idle" in p for p in res["problems"]))
 
+    def test_check_moonshine_server_free_fails_closed_on_http_and_timeout(self):
+        class FakeOpener:
+            def __init__(self, exc):
+                self.exc = exc
+
+            def open(self, *args, **kwargs):
+                raise self.exc
+
+        with patch.object(verify_video.urllib.request, "build_opener", return_value=FakeOpener(urllib.error.URLError(ConnectionRefusedError()))):
+            self.assertIsNone(verify_video.check_moonshine_server_free())
+
+        http_err = urllib.error.HTTPError("http://127.0.0.1:47989/serverinfo", 503, "Busy", {}, None)
+        with patch.object(verify_video.urllib.request, "build_opener", return_value=FakeOpener(http_err)):
+            res = verify_video.check_moonshine_server_free()
+        self.assertIsNotNone(res)
+        self.assertIn("503", res["error"])
+
+        with patch.object(verify_video.urllib.request, "build_opener", return_value=FakeOpener(TimeoutError("timed out"))):
+            res = verify_video.check_moonshine_server_free()
+        self.assertIsNotNone(res)
+        self.assertIn("timed out", res["error"])
+
     def test_hw_lock_refuses_concurrent_smoke(self):
         with open(self.lock_path, "a") as held:
             fcntl.flock(held, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -164,6 +202,27 @@ class VerifyVideoTests(unittest.TestCase):
                 result = verify_video.main(["smoke", "--output", str(Path(self.temp.name) / "out")])
             self.assertEqual(result, 2)
             run.assert_not_called()
+
+    def test_smoke_does_not_self_block_when_lock_meta_missing(self):
+        fake_bench = Path(self.temp.name) / "bench"
+        fake_bench.write_text("#!/bin/sh\n")
+        fake_bench.chmod(0o755)
+        out = Path(self.temp.name) / "out"
+        with patch.object(verify_video, "resolve_executable", return_value=str(fake_bench)), \
+             patch.object(verify_video, "check_port_free"), \
+             patch.object(verify_video, "check_moonshine_server_free", return_value=None), \
+             patch.object(verify_video, "detect_active_vcn", return_value=[]), \
+             patch.object(verify_video, "read_lock_meta", return_value=None), \
+             patch.object(Path, "glob", return_value=[fake_bench]), \
+             patch.object(verify_video, "run_benchmark", return_value=(0, False, "Session [30 frames, 60.0 fps, 10.0 Mbps]")):
+            result = verify_video.main(["smoke", "--bench", str(fake_bench), "--app", str(fake_bench), "--output", str(out)])
+        self.assertEqual(result, 0)
+        self.assertEqual(json.loads((out / "report.json").read_text())["verdict"], "PASS")
+
+    def test_empty_xdg_state_home_falls_back_to_home(self):
+        with patch.dict(os.environ, {"MOONSHINE_HW_LOCK_PATH": "", "XDG_STATE_HOME": ""}):
+            path = verify_video.default_hw_lock_path()
+        self.assertEqual(path, Path.home() / ".local/state" / "moonshine-bench" / "hw.lock")
 
 
 if __name__ == "__main__":

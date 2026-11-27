@@ -176,6 +176,22 @@ class BoundedTests(unittest.TestCase):
                 cmd.assert_not_called()
         self.assertFalse(self.out.exists())
 
+    def test_default_lock_path_handles_empty_xdg_state_home_and_override(self):
+        import os
+        with patch.dict(os.environ, {"TV_GUI_LOCK_PATH": "", "XDG_STATE_HOME": ""}):
+            self.assertEqual(bounded_tv.default_lock_path(), str(Path.home() / ".local/state" / "homelab-tv" / "gui.lock"))
+        with patch.dict(os.environ, {"TV_GUI_LOCK_PATH": "/tmp/custom-tv.lock"}):
+            self.assertEqual(bounded_tv.default_lock_path(), "/tmp/custom-tv.lock")
+
+    def test_lock_contention_includes_holder_metadata(self):
+        meta_path = Path(f"{bounded_tv.LOCK_PATH}.meta")
+        meta_path.write_text(json.dumps({"pid": 4242, "owner": "tv-lock"}) + "\n")
+        with open(bounded_tv.LOCK_PATH, "a") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            with self.assertRaises(RuntimeError) as caught:
+                bounded_tv.acquire_tv_lock("unit-test")
+        self.assertIn("tv-lock", str(caught.exception))
+
     def test_unknown_running_response_fails_closed(self):
         with self.assertRaises(RuntimeError):
             verify_tv.running_apps(subprocess.CompletedProcess([], 0, "unknown output", ""))

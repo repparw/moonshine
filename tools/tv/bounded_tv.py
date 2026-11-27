@@ -2,6 +2,7 @@
 
 import contextlib
 from datetime import datetime, timezone
+import errno
 import fcntl
 import io
 import json
@@ -24,17 +25,50 @@ def default_lock_path():
     override = os.environ.get("TV_GUI_LOCK_PATH")
     if override:
         return override
-    state_home = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local/state"))
+    state_home = Path(os.environ.get("XDG_STATE_HOME") or (Path.home() / ".local/state"))
     return str(state_home / "homelab-tv" / "gui.lock")
 
 
-LOCK_PATH = default_lock_path()
+_INITIAL_LOCK_PATH = default_lock_path()
+LOCK_PATH = _INITIAL_LOCK_PATH
 
 
-def _acquire_tv_lock(purpose):
-    lock_file = Path(LOCK_PATH)
+def resolve_lock_path():
+    if LOCK_PATH != _INITIAL_LOCK_PATH:
+        return LOCK_PATH
+    return default_lock_path()
+
+
+def read_tv_lock_meta(lock_path):
+    meta_file = Path(f"{lock_path}.meta")
+    if not meta_file.is_file():
+        return None
+    try:
+        return json.loads(meta_file.read_text())
+    except (OSError, json.JSONDecodeError):
+        return None
+
+
+def check_tv_lock_free(lock_path=None):
+    resolved = Path(lock_path if lock_path is not None else resolve_lock_path())
+    if not resolved.exists():
+        return None
+    try:
+        with open(resolved, "r") as handle:
+            fcntl.flock(handle, fcntl.LOCK_SH | fcntl.LOCK_NB)
+            fcntl.flock(handle, fcntl.LOCK_UN)
+        return None
+    except OSError as exc:
+        if exc.errno in (errno.EAGAIN, errno.EWOULDBLOCK):
+            return read_tv_lock_meta(resolved) or {"lock_path": str(resolved)}
+        return {"lock_path": str(resolved), "error": str(exc)}
+
+
+def acquire_tv_lock(purpose):
+    resolved = resolve_lock_path()
+    lock_file = Path(resolved)
     lock_file.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-    meta_file = Path(f"{LOCK_PATH}.meta")
+    meta_file = Path(f"{resolved}.meta")
     lock = None
     try:
         lock = open(lock_file, "a")
@@ -42,13 +76,15 @@ def _acquire_tv_lock(purpose):
     except OSError as exc:
         if lock is not None:
             lock.close()
-        holder = ""
-        if meta_file.is_file():
-            try:
-                holder = f" (held by {meta_file.read_text().strip()})"
-            except OSError:
-                pass
-        raise RuntimeError(f"TV GUI lock unavailable ({LOCK_PATH}): {exc}{holder}") from exc
+        if exc.errno in (errno.EAGAIN, errno.EWOULDBLOCK):
+            holder = ""
+            if meta_file.is_file():
+                try:
+                    holder = f" (held by {meta_file.read_text().strip()})"
+                except OSError:
+                    pass
+            raise RuntimeError(f"TV GUI lock unavailable ({resolved}): {exc}{holder}") from exc
+        raise RuntimeError(f"TV GUI lock failed ({resolved}): {exc}") from exc
     meta = {
         "pid": os.getpid(),
         "owner": "moonshine-verify-tv",
@@ -62,12 +98,19 @@ def _acquire_tv_lock(purpose):
     return lock, meta_file
 
 
-def _release_tv_lock(lock, meta_file):
+def release_tv_lock(lock, meta_file):
     try:
         meta_file.unlink(missing_ok=True)
     except OSError:
         pass
-    lock.close()
+    try:
+        fcntl.flock(lock, fcntl.LOCK_UN)
+    finally:
+        lock.close()
+
+
+_acquire_tv_lock = acquire_tv_lock
+_release_tv_lock = release_tv_lock
 
 
 def now():
@@ -157,7 +200,7 @@ def require_idle_tv(tv):
 
 def run(args, cli, get_running, running_apps):
     try:
-        lock, meta_file = _acquire_tv_lock(f"verify_tv run {args.app_id}")
+        lock, meta_file = acquire_tv_lock(f"verify_tv run {args.app_id}")
     except RuntimeError as exc:
         print(str(exc), file=sys.stderr)
         return 2
@@ -185,7 +228,7 @@ def run(args, cli, get_running, running_apps):
         def invoke(action, extra=()):
             output = io.StringIO()
             with contextlib.redirect_stdout(output):
-                rc = cli([action, *base, *extra])
+                rc = cli([action, *base, *extra], _lock_held=True)
             (out / f"{action}.json").write_text(output.getvalue())
             if rc:
                 raise RuntimeError(f"{action} failed with exit code {rc}")
@@ -257,7 +300,7 @@ def run(args, cli, get_running, running_apps):
             report["launch_attempted"] = launch_attempted
             (out / "run-report.json").write_text(json.dumps(report, indent=2) + "\n")
             print(json.dumps({"report": str(out / "run-report.json"), "phase": report["phase"], "cleanup": report["cleanup"], "next_action": report["next_action"]}))
-        _release_tv_lock(lock, meta_file)
+        release_tv_lock(lock, meta_file)
         for value, handler in old_signals.items():
             signal.signal(value, handler)
     return exit_code

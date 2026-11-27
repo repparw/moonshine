@@ -5,7 +5,7 @@ description: "Verify Moonshine's Linux host video pipeline using the repository'
 
 # Verify Moonshine host video
 
-Exercises Moonshine's **host encode path** only (not a Moonlight client or TV display). Read [tools/verification/README.md](../../../tools/verification/README.md) for full flag/artifact details and [docs/alpha-c3-baselines.md](../../../docs/alpha-c3-baselines.md) for settled RX 6700 XT limits.
+Exercises Moonshine's **host encode path** only (not a Moonlight client or TV display). Read [tools/verification/README.md](../../../tools/verification/README.md) for full flag and artifact details.
 
 ## Steps
 

@@ -58,6 +58,8 @@
           ];
           # Share compiled crate artifacts across worktrees without sharing target/.
           RUSTC_WRAPPER = "${pkgs.sccache}/bin/sccache";
+          # sccache cannot cache crates when Cargo incremental compilation is enabled.
+          CARGO_INCREMENTAL = "0";
           packages = with pkgs; [
             rustfmt
             clippy
