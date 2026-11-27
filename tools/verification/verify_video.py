@@ -87,31 +87,15 @@ def load_compare_sha256(target):
     return sha256_file(path)
 
 
-def count_unreadable_fdinfo_pids(proc_root=Path("/proc")):
-    """Count numeric /proc/<pid>/fdinfo directories unreadable due to permissions."""
+def sample_vcn_clients(proc_root=Path("/proc"), *, stats=None):
+    """Return {(pid, client_id): (comm, total_video_engine_ns)} from DRM fdinfo."""
+    readings = {}
     unreadable = 0
     try:
         entries = list(proc_root.iterdir())
     except OSError:
-        return -1
-    for pid_dir in entries:
-        if not pid_dir.name.isdigit():
-            continue
-        try:
-            list((pid_dir / "fdinfo").iterdir())
-        except PermissionError:
-            unreadable += 1
-        except OSError:
-            continue
-    return unreadable
-
-
-def sample_vcn_clients(proc_root=Path("/proc")):
-    """Return {(pid, client_id): (comm, total_video_engine_ns)} from DRM fdinfo."""
-    readings = {}
-    try:
-        entries = list(proc_root.iterdir())
-    except OSError:
+        if stats is not None:
+            stats["unreadable_pids"] = -1
         return readings
     for pid_dir in entries:
         if not pid_dir.name.isdigit():
@@ -119,6 +103,9 @@ def sample_vcn_clients(proc_root=Path("/proc")):
         fdinfo_dir = pid_dir / "fdinfo"
         try:
             fd_entries = list(fdinfo_dir.iterdir())
+        except PermissionError:
+            unreadable += 1
+            continue
         except OSError:
             continue
         comm = None
@@ -143,15 +130,23 @@ def sample_vcn_clients(proc_root=Path("/proc")):
             key = (int(pid_dir.name), client_id)
             if key not in readings or total_ns > readings[key][1]:
                 readings[key] = (comm, total_ns)
+    if stats is not None:
+        stats["unreadable_pids"] = unreadable
     return readings
 
 
-def detect_active_vcn(sample_seconds=VCN_SAMPLE_SECONDS, proc_root=Path("/proc")):
+def detect_active_vcn(sample_seconds=VCN_SAMPLE_SECONDS, proc_root=Path("/proc"), *, stats=None):
     """Detect processes actively consuming DRM video decode/encode engines."""
-    first = sample_vcn_clients(proc_root)
+    first_stats = {}
+    second_stats = {}
+    first = sample_vcn_clients(proc_root, stats=first_stats)
     if sample_seconds > 0:
         time.sleep(sample_seconds)
-    second = sample_vcn_clients(proc_root)
+    second = sample_vcn_clients(proc_root, stats=second_stats)
+    if stats is not None:
+        u1 = first_stats.get("unreadable_pids", 0)
+        u2 = second_stats.get("unreadable_pids", 0)
+        stats["unreadable_pids"] = -1 if (u1 < 0 or u2 < 0) else max(u1, u2)
     active = []
     for key, (comm, ns_after) in second.items():
         if key not in first:
@@ -262,6 +257,7 @@ def preflight(
     app,
     bench,
     allow_vcn_busy=False,
+    strict_vcn=False,
     compare_against=None,
     lock_path=None,
     check_lock=True,
@@ -297,8 +293,22 @@ def preflight(
     active_server = check_moonshine_server_free(port=host_port)
     if active_server is not None:
         problems.append(f"production Moonshine server is not idle ({active_server}); refusing to contend with live stream")
-    active_vcn = detect_active_vcn()
-    vcn_unreadable_pids = count_unreadable_fdinfo_pids()
+    vcn_stats = {}
+    active_vcn = detect_active_vcn(stats=vcn_stats)
+    vcn_unreadable_pids = vcn_stats.get("unreadable_pids", 0)
+    if vcn_unreadable_pids < 0:
+        vcn_scope = "unreadable"
+    elif vcn_unreadable_pids > 0:
+        vcn_scope = "same-uid-only"
+    else:
+        vcn_scope = "all-pids"
+    if vcn_unreadable_pids < 0 and not allow_vcn_busy:
+        problems.append("cannot inspect /proc for active VCN clients (pass --allow-vcn-busy to override)")
+    elif strict_vcn and vcn_unreadable_pids > 0 and not allow_vcn_busy:
+        problems.append(
+            f"cannot inspect {vcn_unreadable_pids} other-UID process(es) for active VCN under --strict-vcn "
+            "(run with fdinfo read access or pass --allow-vcn-busy)"
+        )
     if active_vcn and not allow_vcn_busy:
         summary = ", ".join(f"{item['comm']}(pid={item['pid']})" for item in active_vcn)
         problems.append(
@@ -314,6 +324,7 @@ def preflight(
         "bench_provenance": provenance,
         "render_nodes": usable,
         "active_vcn": active_vcn,
+        "vcn_scope": vcn_scope,
         "vcn_unreadable_pids": vcn_unreadable_pids,
         "moonshine_server_busy": active_server,
         "hw_lock": str(resolved_lock),
@@ -397,6 +408,7 @@ def main(argv=None):
     parser.add_argument("--min-fps", type=float, default=0.0, help="optional environment-specific throughput gate")
     parser.add_argument("--host-port", type=int, default=SERVERINFO_PORT, help="Moonshine serverinfo HTTP port")
     parser.add_argument("--allow-vcn-busy", action="store_true", help="allow running while another process uses VCN")
+    parser.add_argument("--strict-vcn", action="store_true", help="fail closed if any other-UID /proc/<pid>/fdinfo is unreadable")
     parser.add_argument("--compare-against", help="baseline binary or report.json; fail if sha256 matches")
     parser.add_argument("--output", type=Path, help="artifact directory (default: target/verification/<timestamp>)")
     args = parser.parse_args(argv)
@@ -416,6 +428,7 @@ def main(argv=None):
             args.app,
             args.bench,
             allow_vcn_busy=args.allow_vcn_busy,
+            strict_vcn=args.strict_vcn,
             compare_against=args.compare_against,
             lock_path=lock_path,
             check_lock=True,
@@ -442,6 +455,7 @@ def main(argv=None):
             args.app,
             args.bench,
             allow_vcn_busy=args.allow_vcn_busy,
+            strict_vcn=args.strict_vcn,
             compare_against=args.compare_against,
             lock_path=lock_path,
             check_lock=False,

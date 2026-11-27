@@ -224,6 +224,59 @@ class VerifyVideoTests(unittest.TestCase):
             path = verify_video.default_hw_lock_path()
         self.assertEqual(path, Path.home() / ".local/state" / "moonshine-bench" / "hw.lock")
 
+    def test_sample_vcn_clients_counts_unreadable_in_single_pass(self):
+        proc_root = Path(self.temp.name) / "proc"
+        (proc_root / "101" / "fdinfo").mkdir(parents=True)
+        (proc_root / "101" / "fdinfo" / "3").write_text("drm-client-id: 7\ndrm-engine-dec: 500 ns\n")
+        (proc_root / "101" / "comm").write_text("player\n")
+        (proc_root / "202" / "fdinfo").mkdir(parents=True)
+
+        orig_iterdir = Path.iterdir
+        def fake_iterdir(path_self):
+            if path_self == proc_root / "202" / "fdinfo":
+                raise PermissionError("denied")
+            return orig_iterdir(path_self)
+
+        stats = {}
+        with patch.object(Path, "iterdir", fake_iterdir):
+            readings = verify_video.sample_vcn_clients(proc_root, stats=stats)
+        self.assertEqual(readings, {(101, "7"): ("player", 500)})
+        self.assertEqual(stats["unreadable_pids"], 1)
+
+    def test_preflight_vcn_unreadable_proc_fails_closed_and_strict_vcn(self):
+        fake_bench = Path(self.temp.name) / "bench"
+        fake_bench.write_text("#!/bin/sh\n")
+        fake_bench.chmod(0o755)
+
+        def unreadable_proc(*, stats=None):
+            if stats is not None:
+                stats["unreadable_pids"] = -1
+            return []
+
+        def partial_proc(*, stats=None):
+            if stats is not None:
+                stats["unreadable_pids"] = 3
+            return []
+
+        with patch.object(verify_video, "resolve_executable", return_value=str(fake_bench)), \
+             patch.object(verify_video, "check_port_free"), \
+             patch.object(verify_video, "check_moonshine_server_free", return_value=None), \
+             patch.object(Path, "glob", return_value=[fake_bench]):
+            with patch.object(verify_video, "detect_active_vcn", side_effect=unreadable_proc):
+                blocked = verify_video.preflight("vkcube", str(fake_bench), lock_path=self.lock_path)
+                allowed = verify_video.preflight("vkcube", str(fake_bench), allow_vcn_busy=True, lock_path=self.lock_path)
+            self.assertEqual(blocked["vcn_scope"], "unreadable")
+            self.assertTrue(any("cannot inspect /proc" in p for p in blocked["problems"]))
+            self.assertEqual(allowed["problems"], [])
+
+            with patch.object(verify_video, "detect_active_vcn", side_effect=partial_proc):
+                default_ok = verify_video.preflight("vkcube", str(fake_bench), lock_path=self.lock_path)
+                strict_blocked = verify_video.preflight("vkcube", str(fake_bench), strict_vcn=True, lock_path=self.lock_path)
+            self.assertEqual(default_ok["vcn_scope"], "same-uid-only")
+            self.assertEqual(default_ok["vcn_unreadable_pids"], 3)
+            self.assertEqual(default_ok["problems"], [])
+            self.assertTrue(any("--strict-vcn" in p for p in strict_blocked["problems"]))
+
 
 if __name__ == "__main__":
     unittest.main()
