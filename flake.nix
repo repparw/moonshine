@@ -56,14 +56,34 @@
             pkgs.libglvnd
             pkgs.vulkan-loader
           ];
+          # Share compiled crate artifacts across worktrees without sharing target/.
+          RUSTC_WRAPPER = "${pkgs.sccache}/bin/sccache";
+          # sccache cannot cache crates when Cargo incremental compilation is enabled.
+          CARGO_INCREMENTAL = "0";
           packages = with pkgs; [
             rustfmt
             clippy
+            sccache
             python3 # Hardware-independent smoke verifier and CI tests
             vulkan-tools
             xwayland
           ];
         };
+      });
+
+      checks = forAllSystems (pkgs: {
+        verification-helper-tests = pkgs.runCommand "moonshine-verification-helper-tests" { } ''
+          export PYTHONPYCACHEPREFIX="$TMPDIR/pycache"
+          ${pkgs.python3}/bin/python3 -m py_compile ${self}/tools/verification/*.py
+          ${pkgs.python3}/bin/python3 -B -m unittest discover -s ${self}/tools/verification -p 'test_*.py'
+          touch "$out"
+        '';
+        tv-helper-tests = pkgs.runCommand "moonshine-tv-helper-tests" { } ''
+          export PYTHONPYCACHEPREFIX="$TMPDIR/pycache"
+          ${pkgs.python3}/bin/python3 -m py_compile ${self}/tools/tv/*.py
+          ${pkgs.python3}/bin/python3 -B -m unittest discover -s ${self}/tools/tv -p 'test_*.py'
+          touch "$out"
+        '';
       });
     };
 }

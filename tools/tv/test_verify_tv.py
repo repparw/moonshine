@@ -1,10 +1,14 @@
 """Offline checks of webOS launch requests; no TV commands are executed."""
 
+import fcntl
 import importlib.util
+import io
 import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from unittest.mock import patch
 
 module_path = Path(__file__).with_name("verify_tv.py")
@@ -14,6 +18,14 @@ spec.loader.exec_module(module)
 
 
 class VerifyTVTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.lock_path = Path(self.temp.name) / "gui.lock"
+        env_patch = patch.dict(os.environ, {"TV_GUI_LOCK_PATH": str(self.lock_path)})
+        env_patch.start()
+        self.addCleanup(env_patch.stop)
+
     def test_webos_launch_payload_matches_moonlight_source_fields(self):
         cmd = module.launch_command("living-room", "com.example.moonlight", "123e4567-e89b-12d3-a456-426614174000", 4)
         self.assertEqual(cmd[:4], ["ares-launch", "--device", "living-room", "com.example.moonlight"])
@@ -33,7 +45,6 @@ class VerifyTVTests(unittest.TestCase):
             run.assert_not_called()
             self.assertFalse((Path(directory) / "report.json").exists())
 
-
     def test_start_without_confirmation_never_queries_device(self):
         with patch.object(module, "get_running") as status, patch.object(module.shutil, "which") as lookup:
             with self.assertRaises(SystemExit) as caught:
@@ -44,6 +55,29 @@ class VerifyTVTests(unittest.TestCase):
             status.assert_not_called()
             lookup.assert_not_called()
 
+    def test_start_refuses_when_tv_gui_lock_is_held(self):
+        with open(self.lock_path, "a") as held:
+            fcntl.flock(held, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            with tempfile.TemporaryDirectory() as directory, patch.object(module.shutil, "which", return_value="/bin/true"), patch.object(module, "get_running") as status, patch.object(module.subprocess, "run") as run:
+                rc = module.main(["start", "--device", "a", "--app-id", "com.example.moonlight",
+                                  "--host-uuid", "123e4567-e89b-12d3-a456-426614174000",
+                                  "--host-app-id", "3", "--out", directory, "--confirm"])
+                self.assertEqual(rc, 2)
+                status.assert_not_called()
+                run.assert_not_called()
+
+    def test_doctor_reports_tv_gui_lock_status(self):
+        fake = type("Result", (), {"returncode": 0, "stdout": "[Info] Set target device : a\n", "stderr": ""})()
+        with open(self.lock_path, "a") as held:
+            fcntl.flock(held, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            Path(f"{self.lock_path}.meta").write_text(json.dumps({"pid": 999, "owner": "tv-lock"}))
+            buf = io.StringIO()
+            with patch.object(module.shutil, "which", return_value="/bin/true"), patch.object(module, "get_running", return_value=fake), redirect_stdout(buf):
+                rc = module.main(["doctor", "--device", "a", "--app-id", "com.example.moonlight"])
+        self.assertEqual(rc, 0)
+        data = json.loads(buf.getvalue())
+        self.assertEqual(data["tv_gui_lock"], str(self.lock_path))
+        self.assertEqual(data["tv_gui_lock_holder"]["owner"], "tv-lock")
 
     def test_start_refuses_failed_running_app_query(self):
         fake = type("Result", (), {"returncode": 1, "stdout": "", "stderr": "device unavailable"})()
