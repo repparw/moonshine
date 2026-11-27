@@ -10,10 +10,9 @@ from proven limits instead of repeating settled experiments.
 - **Client (LG C3):** LG OLED55C3PSA, webOS TV 5.0 (rooted), MediaTek MT7668
   USB Wi-Fi 5 (`wlan_mt7668_usb`, 5 GHz ch 149 / 80 MHz), TP-Link Archer AX23
   v2.0 AP (Terraform state in `repparw/nix:infra/router/`).
-- **Network confounder:** Alpha's `wan-ingress-shaping` (`repparw/nix:modules/aspects/networking.nix`)
-  applies a 23 Mbps CAKE ingress limit to all `eth0` ingress, including LAN
-  peers (TV → Alpha). Alpha → TV streaming egress is unaffected, but TV → Alpha
-  throughput/TCP tests are confounded unless accounted for.
+- **Historical network note:** Earlier Oct–Nov 2026 TV → Alpha throughput tests
+  were confounded by Alpha's old-ISP 23 Mbps CAKE `wan-ingress-shaping` on
+  `eth0`; that shaper was removed in `repparw/nix#678` (`bdc95c477`).
 
 ## Proven Host Ceilings (RX 6700 XT VCN)
 
